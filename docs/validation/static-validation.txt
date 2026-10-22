@@ -1,0 +1,9 @@
+Swift static parser: 208 changed/new files; no new parser errors.
+Upstream parser limitations: Sources/Vorssaint/Services/AgentUsage/AgentCodexServer.swift, Sources/Vorssaint/Services/Audio/AirPlayRouteManager.swift, Sources/Vorssaint/Services/Notch/NotchService.swift, Sources/Vorssaint/Services/QuickTools/QuickTogglesService.swift, Sources/Vorssaint/Services/Recorder/RecorderExporter.swift, Tests/NotchMascotTests.swift
+Actionlint 1.7.12: PASS
+zsh syntax: PASS
+Workflow YAML/resource plist parsing: PASS
+Test-source generation: PASS
+Preference cleanup shell test: PASS
+git diff --check: PASS
+Swift compiler/typechecking/unit tests/macOS packaging: NOT RUN
