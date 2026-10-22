@@ -34,6 +34,7 @@ final class NotchEyesHost: NSView {
     private var idles = true
     private var style = "round"
     private var lastMovement = Date.distantPast
+    private var previousReduceMotion = false
     private var reduceMotion: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -52,11 +53,21 @@ final class NotchEyesHost: NSView {
     }
     func configure(camera: CGFloat, wing: CGFloat, size: Double, sensitivity: Double,
                    blink: Bool, idle: Bool, style: String) {
+        let clampedSize = CGFloat(NotchEyesSupport.eyeSize(size))
+        let motionChanged = previousReduceMotion != reduceMotion
+        let schedulingChanged = blinks != blink || idles != idle || motionChanged
+        let geometryChanged = self.camera != camera || self.wing != wing
+            || self.size != clampedSize || self.style != style
         self.camera = camera; self.wing = wing
-        self.size = NotchEyesSupport.eyeSize(size); self.sensitivity = sensitivity
+        self.size = clampedSize; self.sensitivity = sensitivity
         blinks = blink; idles = idle; self.style = style
-        needsLayout = true
-        if window != nil { schedule() }
+        previousReduceMotion = reduceMotion
+        if geometryChanged { needsLayout = true }
+        if motionChanged && reduceMotion {
+            for item in eyes + pupils { item.removeAllAnimations() }
+        }
+        // Unrelated island updates must not postpone blinking or reset idle time.
+        if schedulingChanged && window != nil { schedule() }
     }
     override func viewDidChangeBackingProperties() {
         super.viewDidChangeBackingProperties()
