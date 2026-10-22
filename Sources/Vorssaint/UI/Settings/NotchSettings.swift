@@ -161,6 +161,7 @@ struct NotchSettings: View {
                 }
             }
             NotchSettingsTabRow(tab: $tab, language: l10n.language, showsCompanion: features.isAvailable(.notchMascot),
+                                showsEyes: features.isAvailable(.notchEyes),
                                 canOpen: enabled) { NotchService.shared.open() }
             if tab == .content {
                 GeometryReader { proxy in contentEditor(in: proxy.size) }
@@ -180,6 +181,9 @@ struct NotchSettings: View {
         .onAppear(perform: consumeCompanionHint)
         .onChange(of: router.notchCompanion) { _, _ in consumeCompanionHint() }
         // Uninstalled while its tab shows, the companion leaves the page to the layout.
+        .onChange(of: features.isAvailable(.notchEyes)) { _, installed in
+            if !installed, tab == .eyes { tab = .layout }
+        }
         .onChange(of: features.isAvailable(.notchMascot)) { _, installed in
             if !installed, tab == .companion { tab = .layout }
         }
@@ -201,6 +205,7 @@ struct NotchSettings: View {
                 case .activity: activityPage
                 case .behavior: behaviorPage
                 case .companion: EmptyView()
+                case .eyes: NotchEyesSettings()
                 }
             }.padding(.bottom, 22)
         }.id(tab)

@@ -28,7 +28,7 @@ enum ScreenshotCapturePolicy {
     }
 
     /// `islandWindowIDs` are the Dynamic Island windows that show in captures.
-    /// The island has its own preference for that, so "Hide Vorssaint windows"
+    /// The island has its own preference for that, so "Hide ONE DESK windows"
     /// leaves them in, but a caller that protects them keeps them out.
     static func excludedWindowIDs(hideVorssaintWindows: Bool,
                                   ownWindowIDs: Set<CGWindowID>,

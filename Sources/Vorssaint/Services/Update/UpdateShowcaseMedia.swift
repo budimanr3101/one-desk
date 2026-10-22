@@ -20,14 +20,13 @@ enum UpdateShowcaseInfo {
            FileManager.default.fileExists(atPath: url.path) {
             return url
         }
-        let desktopDemo = URL(fileURLWithPath: "/Users/vorssaint/Desktop/demo.gif")
-        return FileManager.default.fileExists(atPath: desktopDemo.path) ? desktopDemo : nil
+        return nil
     }
 
     static var cacheDirectory: URL {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
-        let bundleID = Bundle.main.bundleIdentifier ?? "com.vorssaint.utils"
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.onedesk.app"
         return base
             .appendingPathComponent(bundleID, isDirectory: true)
             .appendingPathComponent("UpdateShowcase", isDirectory: true)
@@ -80,6 +79,8 @@ final class UpdateShowcaseMediaLoader: ObservableObject {
             return
         }
 
+        // The fork does not download upstream promotional media.
+        guard !AppInfo.isDeveloperBuild else { return }
         let cached = UpdateShowcaseInfo.cachedMediaURL
         if UpdateShowcaseInfo.mediaIsTrusted(at: cached) {
             state = .ready(cached)

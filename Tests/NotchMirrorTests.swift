@@ -74,6 +74,10 @@ enum NotchMirrorContract {
         var compactActivity: NotchCompactActivity?
         var compactCompanion: NotchCompactActivity?
         var idleContent = NotchIdleContent.none
+        var eyesVisible = false
+        func eyesShow(on geometry: NotchGeometry) -> Bool {
+            eyesVisible && (geometry.floats || geometry.restingWingWidth > 0)
+        }
         var mascotVisible = false
         func mascotShows(on geometry: NotchGeometry) -> Bool {
             mascotVisible && (geometry.floats || geometry.restingWingWidth > 0)
@@ -225,6 +229,11 @@ enum NotchMirrorContract {
                      && (service.mirrors[1]?.model.size.width ?? 0) > builtInBase.cameraWidth,
                      "a copy beside a camera opens its wings for the resting companion")
         service.mascotVisible = false
+        service.eyesVisible = true
+        service.syncMirrors()
+        suite.expect(service.mirrors[1]?.model.size == builtInBase.collapsed,
+                     "the existing mirror layout reserves wings for Notch Eyes")
+        service.eyesVisible = false
         service.syncMirrors()
 
         // A click on a copy brings the island there, open, closing it where it was.

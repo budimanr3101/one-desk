@@ -7,6 +7,12 @@ import Foundation
 
 /// Every UserDefaults key used by the app, in one place.
 enum DefaultsKey {
+    static let notchEyesEnabled = "notchEyesEnabled"
+    static let notchEyesStyle = "notchEyesStyle"
+    static let notchEyesSize = "notchEyesSize"
+    static let notchEyesSensitivity = "notchEyesSensitivity"
+    static let notchEyesBlink = "notchEyesBlink"
+    static let notchEyesIdle = "notchEyesIdle"
     static let language = "appLanguage"                   // AppLanguage.rawValue
     static let appearance = "appAppearance"               // AppAppearance.rawValue
     static let liquidGlassEnabled = "liquidGlassEnabled"  // Liquid Glass in windows and panels on macOS 26+
@@ -1189,6 +1195,12 @@ enum Defaults {
     static let allowedMonitorAlertCooldowns = [2, 5, 15, 30, 60]
 
     static let registeredDefaults: [String: Any] = [
+        DefaultsKey.notchEyesEnabled: false,
+        DefaultsKey.notchEyesStyle: "round",
+        DefaultsKey.notchEyesSize: 14.0,
+        DefaultsKey.notchEyesSensitivity: 1.0,
+        DefaultsKey.notchEyesBlink: true,
+        DefaultsKey.notchEyesIdle: true,
         DefaultsKey.appearance: AppAppearance.fallback.rawValue,
         DefaultsKey.liquidGlassEnabled: false,
         DefaultsKey.notchLiquidGlassEnabled: false,

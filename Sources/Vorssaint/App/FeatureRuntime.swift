@@ -375,6 +375,9 @@ final class FeatureRuntime: ObservableObject {
             else { NotchWatchService.shared.stop() }
         },
         // Leaving folds the wings it rests in, and coming back greets.
+        .notchEyes: {
+            if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
+        },
         .notchMascot: {
             if AppFeature.notch.isAvailable { NotchService.shared.syncWithPreferences() }
         },

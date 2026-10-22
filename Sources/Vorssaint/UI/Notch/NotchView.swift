@@ -657,6 +657,8 @@ struct NotchRestingStrip: View {
     /// Another display's strip, when the island shows on every display.
     var displayGeometry: NotchGeometry? = nil
     @ObservedObject private var music = NotchMusicService.shared
+    @ObservedObject private var features = FeatureRuntime.shared
+    @AppStorage(DefaultsKey.notchEyesEnabled) private var eyesEnabled = false
     @AppStorage(DefaultsKey.notchLowBatteryTint) private var lowBatteryTint = false
     @AppStorage(DefaultsKey.notchLowBatteryThreshold) private var lowBatteryThreshold = NotchSupport.defaultLowBatteryThreshold
     @AppStorage(DefaultsKey.notchLowBatteryEarly) private var earlyBatteryWarning = false
@@ -740,6 +742,11 @@ struct NotchRestingStrip: View {
                     .opacity(wingStepsAside(.right) ? 0 : 1)
                     .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: wingStepsAside(.right))
                 } else { Color.clear }
+            }
+            if eyesEnabled, features.isAvailable(.notchEyes), service.eyesShow(on: geometry) {
+                NotchEyesView(cameraWidth: geometry.cameraWidth, wingWidth: geometry.restingWingWidth)
+                    .frame(width: geometry.collapsed.width, height: geometry.stripHeight)
+                    .allowsHitTesting(false)
             }
             if service.mascotShows(on: geometry) {
                 NotchMascotTrackView(look: NotchMascotSupport.look(),

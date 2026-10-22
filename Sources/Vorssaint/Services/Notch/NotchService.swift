@@ -274,7 +274,7 @@ final class NotchService: ObservableObject {
     private var menuBarMeasurements = NotchMenuBarMeasurements()
     private var screenRefreshWork: DispatchWorkItem?
     private var preferenceSyncWork: DispatchWorkItem?
-    private let menuSpaceQueue = DispatchQueue(label: "com.vorssaint.notch-menu-space", qos: .utility)
+    private let menuSpaceQueue = DispatchQueue(label: "com.onedesk.notch-menu-space", qos: .utility)
     /// The display the island is on. The pointer choice keeps it there until
     /// the island rests, so a preference sync never moves an open island.
     private var displayID: CGDirectDisplayID?
@@ -453,6 +453,18 @@ final class NotchService: ObservableObject {
     /// read this rather than the live preference, so switching it off takes
     /// it away only once its farewell is set up, with no frame between where
     /// it is simply gone.
+    /// Decorative content reserves existing wings only; animation timelines stay unchanged.
+    func eyesShow(on geometry: NotchGeometry) -> Bool {
+        NotchEyesSupport.visible(
+            enabled: UserDefaults.standard.bool(forKey: DefaultsKey.notchEyesEnabled),
+            available: running && AppFeature.notchEyes.isAvailable && AppFeature.notch.isAvailable
+                && UserDefaults.standard.bool(forKey: DefaultsKey.notchEnabled),
+            expanded: expanded || peeking || suspended || hiddenInFullscreen || hiddenUntilHover,
+            activity: compactActivity != nil || notice != nil || dragPlaceholder || captureControls != nil,
+            companion: mascotOn, idleEmpty: idleContent == .none)
+            && (geometry.floats || geometry.restingWingWidth > 0)
+    }
+
     var mascotOn: Bool { mascotWasEnabled ?? false }
 
     /// The camera side it rests on, as the island last synced it, so a side
@@ -886,7 +898,7 @@ final class NotchService: ObservableObject {
     }
     /// A detail's title, the app panel's, or the island's own with no sections.
     var detailTitle: String {
-        if showingAppPanel { return "Vorssaint" }
+        if showingAppPanel { return "ONE DESK" }
         let language = L10n.shared.language
         guard let metric = selectedMetric else { return FeatureStrings.notch(language).title }
         // The fan card opens Fan Control, so its page shares that title.
@@ -938,7 +950,7 @@ final class NotchService: ObservableObject {
                                           reach: named.map { ($0.leading - $0.trailing) / 2 } ?? 0)
                 : resting
         }
-        let resting = geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry))
+        let resting = geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry) || eyesShow(on: geometry))
         return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 
@@ -3090,7 +3102,7 @@ final class NotchService: ObservableObject {
     /// for that display, or the island at rest there.
     private func mirrorSurface(on base: NotchGeometry, activity: NotchCompactActivity?) -> (strip: NotchGeometry, size: CGSize) {
         guard let activity else {
-            return (base, base.restingSize(showsContent: !base.floats && (idleContent != .none || mascotShows(on: base))))
+            return (base, base.restingSize(showsContent: !base.floats && (idleContent != .none || mascotShows(on: base) || eyesShow(on: base))))
         }
         let companion = compactCompanion
         if base.floats { return (base, capsuleStripSize(for: activity, companion: companion, geometry: base)) }

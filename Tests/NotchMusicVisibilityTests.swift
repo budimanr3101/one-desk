@@ -69,6 +69,10 @@ enum NotchMusicVisibilityTests {
         var showingCommandBar = false
         var commandBarClosings = 0
         var commandBarSurfaceSize = CGSize(width: 616, height: 132)
+        var eyesVisible = false
+        func eyesShow(on geometry: NotchGeometry) -> Bool {
+            eyesVisible && (geometry.floats || geometry.restingWingWidth > 0)
+        }
         var mascotVisible = false
         func mascotShows(on geometry: NotchGeometry) -> Bool {
             mascotVisible && (geometry.floats || geometry.restingWingWidth > 0)
@@ -141,7 +145,7 @@ enum NotchMusicVisibilityTests {
     }
 
     static func run(_ suite: TestSuite) {
-        let domain = "com.vorssaint.tests.notch-music-visibility"
+        let domain = "com.onedesk.tests.notch-music-visibility"
         let defaults = UserDefaults(suiteName: domain)!
         defaults.removePersistentDomain(forName: domain)
         ReviewDefaults.current = defaults
@@ -215,6 +219,10 @@ enum NotchMusicVisibilityTests {
                                             safeAreaTop: physical ? 32 : 0, cameraWidth: physical ? 180 : 0,
                                             menuBarHeight: 32, compactSideRoom: 100)
             let closed = service.geometry.restingSize(showsContent: false)
+            let eyesLayout = Service()
+            eyesLayout.geometry = service.geometry
+            eyesLayout.eyesVisible = true
+            suite.expect(eyesLayout.surfaceSize == eyesLayout.geometry.collapsed, "eyes reserve resting wings through the existing surface layout")
             defaults.set(NotchIdleContent.music.rawValue, forKey: DefaultsKey.notchIdleContent)
             defaults.set(true, forKey: DefaultsKey.notchShowPlayingMusic)
             reader.playback = .init(isPlaying: true)

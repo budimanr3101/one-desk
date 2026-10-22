@@ -43,7 +43,7 @@ final class AppUpdatesService: ObservableObject {
     @Published private(set) var hasCheckedThisSession = false
     @Published private(set) var lastError: String?
 
-    private let workQueue = DispatchQueue(label: "com.vorssaint.appupdates", qos: .utility)
+    private let workQueue = DispatchQueue(label: "com.onedesk.appupdates", qos: .utility)
     private lazy var lookupSession: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 10

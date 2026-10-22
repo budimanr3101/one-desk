@@ -5,10 +5,14 @@ import Foundation
 
 /// Static identity of the app, shared by UI, notifications and tooling.
 enum AppInfo {
-    static let name = "Vorssaint"
-    static let copyright = "© 2026 Vorssaint"
-    static let websiteURL = URL(string: "https://vorssaint.com")!
-    static let repositoryURL = URL(string: "https://github.com/vorssaint/vorssaint-utils")!
+    static let name = "ONE DESK"
+    static let copyright = "ONE DESK contributors · Based on Vorssaint © 2026 Vorssaint"
+    static let upstreamRepositoryURL = URL(string: "https://github.com/vorssaint/vorssaint-utils")!
+    // Set this metadata once the destination fork is available.
+    static var repositoryURL: URL {
+        URL(string: Bundle.main.object(forInfoDictionaryKey: "OneDeskRepositoryURL") as? String ?? "https://github.com")!
+    }
+    static var websiteURL: URL { repositoryURL }
     static let coffeeURL = URL(string: "https://buymeacoffee.com/vorssaint")!
     static let discordURL = URL(string: "https://discord.gg/M6BwWH4BJp")!
     static let socialURL = URL(string: "https://x.com/vorssaint")!
@@ -19,10 +23,10 @@ enum AppInfo {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
     }
 
-    /// True for the local "Vorssaint (Developer)" build (bundle id ends in `.dev`).
-    /// It is never published and never auto-updates; all work is tested here first.
+    /// All ONE DESK distributions in this phase are development builds.
+    /// This also gates every upstream update/install entry point.
     static var isDeveloperBuild: Bool {
-        (Bundle.main.bundleIdentifier ?? "").hasSuffix(".dev")
+        true // Development distribution only; no upstream update feed.
     }
 
     /// True when the current version is a pre-release (e.g. 3.3.4-beta.1 or 3.3.4-rc.1).

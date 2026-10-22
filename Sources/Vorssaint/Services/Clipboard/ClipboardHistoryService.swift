@@ -104,7 +104,7 @@ final class ClipboardHistoryService: ObservableObject {
     /// Writes coalesce per mutation cycle; the JSON encode and the disk write
     /// stay off the main thread (a full history of long texts is real work),
     /// serialized so blobs land in mutation order.
-    private static let persistQueue = DispatchQueue(label: "com.vorssaint.utils.clipboard-persist",
+    private static let persistQueue = DispatchQueue(label: "com.onedesk.app.clipboard-persist",
                                                     qos: .utility)
     private var persistScheduled = false
     private var persistenceGeneration = 0
@@ -1725,7 +1725,7 @@ enum ClipboardImageStore {
     /// full size screenshots in memory at once.
     private static let thumbnailQueue: OperationQueue = {
         let queue = OperationQueue()
-        queue.name = "com.vorssaint.utils.clipboard-thumbnails"
+        queue.name = "com.onedesk.app.clipboard-thumbnails"
         queue.maxConcurrentOperationCount = 2
         queue.qualityOfService = .userInitiated
         return queue

@@ -7,7 +7,7 @@
 # build the same code signature — so macOS keeps granted permissions
 # (Accessibility, Screen Recording) across updates instead of re-prompting.
 #
-# This identity name keeps its original "Vorssaint Utils Signing" on purpose: it
+# This identity name keeps its original "ONE DESK Local Signing" on purpose: it
 # is the lookup key build.sh matches, and the released app's designated
 # requirement is pinned to this exact certificate. Renaming it would change that
 # requirement and drop every user's granted permissions. The name lives only in
@@ -21,9 +21,9 @@
 # Run this only to get the same permission-preserving behavior for local builds.
 set -euo pipefail
 
-IDENTITY="Vorssaint Utils Signing"
-KC="$HOME/Library/Keychains/vorssaint-signing.keychain-db"
-KCPASS="vorssaint-signing"
+IDENTITY="ONE DESK Local Signing"
+KC="$HOME/Library/Keychains/onedesk-signing.keychain-db"
+KCPASS="onedesk-signing"
 
 # A find-identity listing also names certificates codesign then rejects, and -v
 # excludes every self-signed one; ask codesign itself with a throwaway copy.

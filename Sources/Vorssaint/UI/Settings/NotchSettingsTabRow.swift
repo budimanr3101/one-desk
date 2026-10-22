@@ -4,7 +4,7 @@
 import SwiftUI
 
 enum NotchSettingsTab: CaseIterable {
-    case layout, content, activity, behavior, companion
+    case layout, content, activity, behavior, companion, eyes
 }
 
 /// The Dynamic Island page's tabs, with the button that opens the island.
@@ -17,6 +17,7 @@ struct NotchSettingsTabRow: View {
     let language: AppLanguage
     /// The companion's tab, once it is installed.
     var showsCompanion = false
+    var showsEyes = false
     let canOpen: Bool
     let open: () -> Void
 
@@ -39,6 +40,7 @@ struct NotchSettingsTabRow: View {
             Text(editor.content).tag(NotchSettingsTab.content)
             Text(editor.activity).tag(NotchSettingsTab.activity)
             Text(editor.behavior).tag(NotchSettingsTab.behavior)
+            if showsEyes { Text("Notch Eyes").tag(NotchSettingsTab.eyes) }
             if showsCompanion {
                 Text(FeatureStrings.notchMascot(language).title).tag(NotchSettingsTab.companion)
             }

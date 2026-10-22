@@ -1,15 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Vorssaint
 
-// Generates all icon assets:
-// - the app iconset and .icns from the exported Default rendition of the
-//   adaptive source (Resources/Brand/AppIcon-Default.png)
-// - the menu bar template glyph and BrandMark from the wordmark master
-//   (Resources/Brand/logo.png)
-// AppIcon-Default.png is a hand-exported twin of Resources/Brand/AppIcon.icon;
-// re-export it whenever the Icon Composer project changes. The build cannot read
-// .icon bundles directly: actool exists only inside full Xcode 26, and the
-// supported local floor is Command Line Tools alone.
+// Generates the original ONE DESK vector desk icon, menu glyph and in-app mark.
+// The iconset and ICNS are produced during the native build; no upstream artwork
+// or Icon Composer bundle is loaded.
 import AppKit
 
 // Current macOS misreads PNG payloads in the legacy small chunks. It downsamples
@@ -25,21 +19,24 @@ let iconSizes: [(name: String, px: Int, icnsType: String?)] = [
 let outDir = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "AppIcon.iconset"
 let scriptDir = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
 let projectDir = scriptDir.deletingLastPathComponent()
-let logoPath = projectDir.appendingPathComponent("Resources/Brand/logo.png").path
-
-guard let logo = NSImage(contentsOfFile: logoPath),
-      let logoTIFF = logo.tiffRepresentation,
-      let logoRep = NSBitmapImageRep(data: logoTIFF)
-else {
-    print("could not load \(logoPath)")
-    exit(1)
+// Original ONE DESK glyph: a desk with two drawers, drawn as vectors.
+func deskImage(background: Bool) -> NSImage {
+    NSImage(size: NSSize(width: 1024, height: 1024), flipped: false) { _ in
+        if background {
+            NSColor.black.setFill()
+            NSBezierPath(roundedRect: NSRect(x: 70, y: 70, width: 884, height: 884), xRadius: 190, yRadius: 190).fill()
+        }
+        NSColor.white.setFill()
+        NSBezierPath(roundedRect: NSRect(x: 220, y: 570, width: 584, height: 72), xRadius: 24, yRadius: 24).fill()
+        for x in [260, 684] {
+            NSBezierPath(roundedRect: NSRect(x: x, y: 350, width: 80, height: 210), xRadius: 22, yRadius: 22).fill()
+        }
+        return true
+    }
 }
-
-let appIconPath = projectDir.appendingPathComponent("Resources/Brand/AppIcon-Default.png").path
-guard let appIconMaster = NSImage(contentsOfFile: appIconPath) else {
-    print("could not load \(appIconPath)")
-    exit(1)
-}
+let logo = deskImage(background: false)
+let logoRep = NSBitmapImageRep(data: logo.tiffRepresentation!)!
+let appIconMaster = deskImage(background: true)
 
 /// Bounding box of visible (non-transparent) pixels, so the mark can be
 /// centered optically regardless of padding in the source file.

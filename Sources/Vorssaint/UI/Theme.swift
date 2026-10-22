@@ -236,7 +236,7 @@ func appDelegate() -> AppDelegate? {
     NSApp.delegate as? AppDelegate
 }
 
-/// The official mark (Resources/Brand/logo.png, trimmed at build time),
+/// The original ONE DESK vector desk mark, generated at build time,
 /// tintable for light or dark surfaces.
 struct BrandMark: View {
     var width: CGFloat

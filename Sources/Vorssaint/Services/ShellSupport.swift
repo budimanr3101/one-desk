@@ -124,19 +124,19 @@ enum AdminShell {
 /// toggle without asking for the administrator password every time.
 /// The password is asked once, when installing (or removing) the rule.
 enum Sudoers {
-    static let rulePath = "/etc/sudoers.d/vorssaint-clamshell"
+    static let rulePath = "/etc/sudoers.d/onedesk-clamshell"
     // Rule files written under earlier names; removed whenever the rule is
     // (re)installed or removed, so the closed-lid permission migrates without an
     // extra password prompt.
     private static let legacyRulePaths = [
-        "/etc/sudoers.d/vorssaint-utils-clamshell",
-        "/etc/sudoers.d/vorss-clamshell",
+        "/etc/sudoers.d/onedesk-utils-clamshell",
+        "/etc/sudoers.d/onedesk-legacy-clamshell",
     ]
 
     /// Serializes native writes and read/reapply probes. Authorization runs
     /// separately with probes suspended, so a probe cannot resurrect a stale
     /// "1" after a restore cleared it and leave lid sleep off without a marker.
-    private static let sleepStateQueue = DispatchQueue(label: "com.vorssaint.utils.pmset-state")
+    private static let sleepStateQueue = DispatchQueue(label: "com.onedesk.app.pmset-state")
     // Authorization runs outside this queue so quitting never waits for a
     // password prompt. Probes must not reapply a stale state during that off.
     private static var sleepStateProbeSuspensions = 0

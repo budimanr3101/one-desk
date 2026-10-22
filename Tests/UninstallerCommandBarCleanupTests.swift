@@ -115,7 +115,7 @@ enum UninstallerCommandBarCleanupTests {
     }
 
     static func run(_ suite: TestSuite) {
-        let domain = "com.vorssaint.tests.uninstall-command-bar.\(UUID())"
+        let domain = "com.onedesk.tests.uninstall-command-bar.\(UUID())"
         let defaults = UserDefaults(suiteName: domain)!
         Preferences.standard = defaults
         let fm = FileManager.default

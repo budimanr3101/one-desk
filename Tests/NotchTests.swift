@@ -8,7 +8,7 @@ import SwiftUI
 
 enum NotchTests {
     private static func railContracts(_ suite: TestSuite) {
-        let domain = "com.vorssaint.tests.notch-fan-only"
+        let domain = "com.onedesk.tests.notch-fan-only"
         let defaults = UserDefaults(suiteName: domain)!
         defaults.removePersistentDomain(forName: domain)
         defer { defaults.removePersistentDomain(forName: domain) }
@@ -1341,7 +1341,7 @@ enum NotchTests {
         suite.expect(extreme.width == 10 && extreme.height == -6, "a fit stays within its ranges")
         suite.expect(NotchCameraFit(width: .nan, height: .infinity) == .zero, "an unreadable fit means none")
 
-        let domain = "com.vorssaint.tests.notch-camera-fit"
+        let domain = "com.onedesk.tests.notch-camera-fit"
         let defaults = UserDefaults(suiteName: domain)!
         defaults.removePersistentDomain(forName: domain)
         defer { defaults.removePersistentDomain(forName: domain) }
@@ -1637,7 +1637,7 @@ enum NotchTests {
         suite.expect(backupKeys.contains(DefaultsKey.notchShortcut)
                 && backupKeys.contains(DefaultsKey.notchShortcutEnabled),
                "the island shortcut travels with the settings backup")
-        let domain = "com.vorssaint.tests.notch-shortcut-\(UUID().uuidString)"
+        let domain = "com.onedesk.tests.notch-shortcut-\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: domain)!
         defer { defaults.removePersistentDomain(forName: domain) }
         func holds(installed: Bool = true, island: Bool = true, shortcut: Bool = true) -> Bool {
@@ -1735,6 +1735,7 @@ enum NotchTests {
         NotchKeyboardLightTests.run(suite)
         NotchActivityTests.run(suite)
         NotchWatchTests.run(suite)
+        NotchEyesTests.run(suite)
         NotchMascotTests.run(suite)
         NotchMascotHidingContract.run(suite)
         NotchMusicExtrasTests.run(suite)
@@ -1746,7 +1747,7 @@ enum NotchTests {
             suite.expect(strings.count == 4 && strings.allSatisfy { !$0.isEmpty && !$0.contains("—") },
                          "the clipboard entry size has complete strings in \(language.rawValue)")
         }
-        let sizeDomain = "com.vorssaint.tests.notch-clipboard-size"
+        let sizeDomain = "com.onedesk.tests.notch-clipboard-size"
         let sizeDefaults = UserDefaults(suiteName: sizeDomain)!
         sizeDefaults.removePersistentDomain(forName: sizeDomain)
         defer { sizeDefaults.removePersistentDomain(forName: sizeDomain) }
@@ -1797,7 +1798,7 @@ enum NotchTests {
                      "an open image keeps its proportions within a range, and one with none is taken as wide")
         suite.expect(NotchLayout.clipboardCompactCardHeight < NotchLayout.clipboardCardHeight && NotchClipboardCardSize.dwell > 0,
                      "a compact entry is shorter than an open one and opens after a pause")
-        let domain = "com.vorssaint.tests.notch"
+        let domain = "com.onedesk.tests.notch"
         let defaults = UserDefaults(suiteName: domain)!
         defaults.removePersistentDomain(forName: domain)
         defer { defaults.removePersistentDomain(forName: domain) }
@@ -1810,7 +1811,7 @@ enum NotchTests {
             defaults.set(value, forKey: key)
         }
         for (key, value) in AppFeature.availabilityDefaults { defaults.set(value, forKey: key) }
-        let firstInstall = "com.vorssaint.tests.notch-new-\(UUID().uuidString)"
+        let firstInstall = "com.onedesk.tests.notch-new-\(UUID().uuidString)"
         let fresh = UserDefaults(suiteName: firstInstall)!
         defer { fresh.removePersistentDomain(forName: firstInstall) }
         fresh.set(NotchControlItem.defaultHidden, forKey: DefaultsKey.notchHiddenControls)
@@ -1843,7 +1844,7 @@ enum NotchTests {
         suite.expect(firstDefaults[DefaultsKey.notchIncludeOtherPlayers] as? Bool == true,
                      "new island setups follow every player unless limited to music apps")
 
-        let priorInstall = "com.vorssaint.tests.notch-existing-\(UUID().uuidString)"
+        let priorInstall = "com.onedesk.tests.notch-existing-\(UUID().uuidString)"
         let existing = UserDefaults(suiteName: priorInstall)!
         defer { existing.removePersistentDomain(forName: priorInstall) }
         existing.set(true, forKey: DefaultsKey.notchEnabled)
@@ -1875,7 +1876,7 @@ enum NotchTests {
         suite.expect(!existing.bool(forKey: DefaultsKey.notchAppPanel),
                      "the one-time migration does not run again after a later preference change")
 
-        let priorChoice = "com.vorssaint.tests.notch-choice-\(UUID().uuidString)"
+        let priorChoice = "com.onedesk.tests.notch-choice-\(UUID().uuidString)"
         let configured = UserDefaults(suiteName: priorChoice)!
         defer { configured.removePersistentDomain(forName: priorChoice) }
         configured.set(true, forKey: DefaultsKey.notchReturnHome)
@@ -3477,7 +3478,7 @@ enum NotchTests {
                "invalid internal positions cannot be serialized into adapter input")
     }
     private static func calendarContracts(_ suite: TestSuite) {
-        let entitlements = NSDictionary(contentsOfFile: "Resources/Vorssaint.entitlements") as? [String: Any]
+        let entitlements = NSDictionary(contentsOfFile: "Resources/ONE DESK.entitlements") as? [String: Any]
         let info = NSDictionary(contentsOfFile: "Resources/Info.plist") as? [String: Any]
         suite.expect(entitlements?["com.apple.security.personal-information.calendars"] as? Bool == true
                && !(info?["NSCalendarsFullAccessUsageDescription"] as? String ?? "").isEmpty,
@@ -3506,9 +3507,9 @@ enum NotchTests {
                && !NotchSupport.keepsPermissionSurface(requesting: false, resolvedAt: 10, now: 11)
                && !NotchSupport.keepsPermissionSurface(requesting: false, resolvedAt: 10, now: 9),
                "permission resolution protects only the short reactivation interval")
-        let defaults = UserDefaults(suiteName: "com.vorssaint.tests.notch-calendar")!
-        defaults.removePersistentDomain(forName: "com.vorssaint.tests.notch-calendar")
-        defer { defaults.removePersistentDomain(forName: "com.vorssaint.tests.notch-calendar") }
+        let defaults = UserDefaults(suiteName: "com.onedesk.tests.notch-calendar")!
+        defaults.removePersistentDomain(forName: "com.onedesk.tests.notch-calendar")
+        defer { defaults.removePersistentDomain(forName: "com.onedesk.tests.notch-calendar") }
         for (key, value) in Defaults.registeredDefaults where key.hasPrefix("notch") { defaults.set(value, forKey: key) }
         for (key, value) in AppFeature.availabilityDefaults { defaults.set(value, forKey: key) }
         suite.expect(!NotchCalendarSupport.isEnabled(in: defaults), "calendar starts off")

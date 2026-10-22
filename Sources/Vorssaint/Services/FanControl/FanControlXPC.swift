@@ -4,12 +4,12 @@
 import Foundation
 
 enum FanControlIdentifiers {
-    static let teamID = "3D485NHW29"
+    static let teamID = "ONEDESK_UNCONFIGURED_TEAM"
 
     #if VORSSAINT_DEVELOPMENT
-    static let appBundleID = "com.vorssaint.utils.dev"
+    static let appBundleID = "com.onedesk.app.dev"
     #else
-    static let appBundleID = "com.vorssaint.utils"
+    static let appBundleID = "com.onedesk.app"
     #endif
 
     static let helperID = "\(appBundleID).fan-control"
