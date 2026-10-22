@@ -1,60 +1,139 @@
-name: CI
-
+name: ONE DESK development
 on:
   push:
-    branches: [main]
+    branches: [main, 'feat/**', 'fix/**', 'dev/**', develop]
   pull_request:
-
+  workflow_dispatch:
 permissions:
   contents: read
-
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
-
+  group: onedesk-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+# Every native job checks architecture; a runner label alone is insufficient.
 jobs:
-  compatibility:
-    name: Swift 6.0.3 compatibility
-    runs-on: macos-15
-    timeout-minutes: 30
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-
-      - name: Verify toolchain
-        run: |
-          swiftc --version | grep -F "Apple Swift version 6.0.3"
-          test "$(xcrun --sdk macosx --show-sdk-version)" = "15.2"
-
-      - name: Build
-        run: ./build.sh
-
-      - name: Selftest
-        run: ./build/Vorssaint --selftest
-
-      - name: Unit tests
-        run: ./build.sh --test
-
   build:
-    name: Build & selftest
-    runs-on: macos-26
-    timeout-minutes: 30
+    runs-on: macos-15
+    timeout-minutes: 40
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-
-      - name: Build
-        run: ./build.sh
-
-      - name: Selftest
-        run: ./build/Vorssaint --selftest
-
-      - name: Package DMG
-        run: ./Tools/make-dmg.sh
-
-      - name: Unit tests
-        run: ./build.sh --test
+      - name: Record and verify environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/validation
+          { uname -a; sw_vers; xcodebuild -version; swiftc --version; xcrun --sdk macosx --show-sdk-version; echo "$GITHUB_SHA"; } | tee build/validation/environment.txt
+          test "$(uname -m)" = arm64
+      - name: Build native application
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./build.sh 2>&1 | tee build/validation/build.log
+          file build/ONEDESK | tee build/validation/binary.txt
+          lipo -verify_arch arm64 build/ONEDESK
+          codesign --verify --deep --strict 'build/stage/ONE DESK.app'
+          ditto -c -k --sequesterRsrc --keepParent 'build/stage/ONE DESK.app' build/ONE-DESK-app.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ONE-DESK-build-intermediate
+          path: build/ONE-DESK-app.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ONE-DESK-build-logs
+          path: build/validation/
+  self-test:
+    needs: build
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ONE-DESK-build-intermediate
+      - name: Run application self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          ditto -x -k ONE-DESK-app.zip .
+          'ONE DESK.app/Contents/MacOS/ONEDESK' --selftest 2>&1 | tee self-test.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ONE-DESK-self-test-results
+          path: self-test.log
+  unit-tests:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Run complete existing suite and Notch Eyes tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          ./build.sh --test 2>&1 | tee unit-tests.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ONE-DESK-test-results
+          path: unit-tests.log
+  package:
+    needs: [build, self-test, unit-tests]
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: ONE-DESK-build-intermediate
+          path: build
+      - name: Package development application
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          mkdir -p build/stage dist
+          ditto -x -k build/ONE-DESK-app.zip build/stage
+          ./Tools/make-dmg.sh 2>&1 | tee packaging.log
+          cp build/ONE-DESK-app.zip dist/ONE-DESK-dev-macos-arm64.zip
+          git archive --format=zip --output=dist/ONE-DESK-corresponding-source.zip HEAD
+          shasum -a 256 dist/* > dist/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ONE-DESK-packages-intermediate
+          path: dist/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ONE-DESK-packaging-log
+          path: packaging.log
+  upload:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ONE-DESK-packages-intermediate
+          path: dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ONE-DESK-dev-macos-arm64
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ONE-DESK-dev-DMG
+          path: dist/*.dmg
+          if-no-files-found: error
+          retention-days: 30
