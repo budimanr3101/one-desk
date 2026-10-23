@@ -404,7 +404,8 @@ enum LocalizationFeatureContractTests {
         suite.expect(bundleLocalizations.contains("tr"), "Info.plist declares Turkish as a bundle localization")
         suite.expect(bundleLocalizations.contains("ko"), "Info.plist declares Korean as a bundle localization")
         let baseAudioPrompt = infoPlist?["NSAudioCaptureUsageDescription"] as? String ?? ""
-        suite.expect(baseAudioPrompt.contains("ONE DESK uses each app's audio"),
+        suite.expect(baseAudioPrompt.contains("ONE DESK uses system audio")
+            && baseAudioPrompt.contains("Live Translate") && baseAudioPrompt.contains("MyMemory"),
                "base audio permission prompt is an English fallback")
         let organizerFolderPromptKeys = [
             "NSDesktopFolderUsageDescription", "NSDocumentsFolderUsageDescription",
@@ -421,6 +422,12 @@ enum LocalizationFeatureContractTests {
                                      encoding: .utf8)) ?? ""
             return organizerFolderPromptKeys.allSatisfy(value.contains)
         }, "every localization explains custom organizer folder access")
+        suite.expect(localizedInfoPlists.allSatisfy { folder in
+            let localized = (try? String(contentsOfFile: "Resources/\(folder)/InfoPlist.strings", encoding: .utf8)) ?? ""
+            return !localized.contains("NSAudioCaptureUsageDescription")
+                && !localized.contains("NSMicrophoneUsageDescription")
+                && !localized.contains("NSSpeechRecognitionUsageDescription")
+        }, "all languages fall back to current capture disclosures instead of stale local-only promises")
         // What the bundle says it speaks and what it ships have to be the same
         // list: a language declared without its folder makes the system offer
         // the app in it and then show every permission prompt in English.
@@ -530,14 +537,14 @@ enum LocalizationFeatureContractTests {
                "a restored backup keeps every setting the app itself ships (\(rejectedByOwnFilter.prefix(6).joined(separator: ", ")))")
         let turkishInfoPlistStrings = (try? String(contentsOfFile: "Resources/tr.lproj/InfoPlist.strings",
                                                    encoding: .utf8)) ?? ""
-        suite.expect(turkishInfoPlistStrings.contains("NSAudioCaptureUsageDescription")
-               && turkishInfoPlistStrings.contains("Hiçbir şey kaydedilmez"),
-               "Turkish InfoPlist.strings localizes the audio permission prompt")
+        suite.expect(!turkishInfoPlistStrings.contains("NSAudioCaptureUsageDescription")
+               && baseAudioPrompt.contains("MyMemory"),
+               "Turkish uses the current English audio fallback until the new disclosure is translated")
         let koreanInfoPlistStrings = (try? String(contentsOfFile: "Resources/ko.lproj/InfoPlist.strings",
                                                   encoding: .utf8)) ?? ""
-        suite.expect(koreanInfoPlistStrings.contains("NSAudioCaptureUsageDescription")
-               && koreanInfoPlistStrings.contains("Mac 밖으로 나가지"),
-               "Korean InfoPlist.strings localizes the audio permission prompt")
+        suite.expect(!koreanInfoPlistStrings.contains("NSAudioCaptureUsageDescription")
+               && baseAudioPrompt.contains("MyMemory"),
+               "Korean uses the current English audio fallback until the new disclosure is translated")
 
     }
 }

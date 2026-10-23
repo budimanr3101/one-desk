@@ -224,3 +224,17 @@ EN→ID and ID→EN. EN “Good morning” returned “Selamat pagi”; the reve
 reachability/schema only, **not translation accuracy**. MyMemory quality is a
 known limitation of the online MVP; evaluate a higher-quality/offline provider
 before relying on captions. No user audio or transcript was used in this check.
+
+## Live Translate CI contract corrections
+
+Run 39973122663 compiled the native app and passed self-test. Unit tests ran
+113561 checks and reported two failures: the generic first-install contract did
+not account for opt-in Live Translate capture, and the localization contract
+expected the previous audio permission wording. The install regression now
+explicitly requires capture and network consent to remain unset. Updated capture
+permission tests enforce the accurate English disclosure; outdated localized
+audio/microphone overrides were removed so they cannot promise local-only use.
+Other translated permissions remain. Translating the new capture disclosures is
+pending. Source parsing, generated tests, permission fallback consistency, shell
+syntax, actionlint, preference cleanup and diff checks pass on Linux. Native
+unit-test rerun and packaging for this correction remain pending CI.

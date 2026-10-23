@@ -526,13 +526,17 @@ enum FeatureCatalogTests {
                 installDefaults.persistentDomain(forName: installSuiteName) ?? [:]
             }
             for feature in AppFeature.allCases
-            where !feature.enabledKeys.isEmpty && feature != .notchLiveEqualizer {
+            where !feature.enabledKeys.isEmpty && feature != .notchLiveEqualizer && feature != .liveTranslate {
                 feature.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
                 suite.expect(feature.enabledKeys.contains {
                     savedValues()[$0] as? Bool == true
                 }, "a new \(feature.rawValue) install saves an enabled main control")
                 for key in feature.enabledKeys { installDefaults.removeObject(forKey: key) }
             }
+            AppFeature.liveTranslate.enableOnFirstInstall(in: installDefaults, savedValues: savedValues())
+            suite.expect(savedValues()[DefaultsKey.liveTranslateEnabled] == nil
+                && savedValues()[DefaultsKey.liveTranslateConsent] == nil,
+                "installing Live Translate leaves capture disabled and does not grant network consent")
             AppFeature.notchLiveEqualizer.enableOnFirstInstall(in: installDefaults,
                                                                 savedValues: savedValues())
             suite.expect(savedValues()[DefaultsKey.notchLiveEqualizer] == nil,

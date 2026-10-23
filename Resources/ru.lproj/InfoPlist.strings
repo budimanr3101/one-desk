@@ -2,13 +2,11 @@
 "NSAppleEventsUsageDescription" = "ONE DESK использует Автоматизацию для перемещения файлов, отправки объектов в Корзину, открытия запрошенных команд и управления воспроизведением в ваших медиаприложениях.";
 
 /* macOS Screen & System Audio Recording permission prompt. */
-"NSAudioCaptureUsageDescription" = "ONE DESK использует звук каждого приложения, чтобы регулировать его громкость в микшере, двигать музыкальные полоски Dynamic Island и добавлять звук Mac в записи экрана, которые вы запускаете. Ничего не покидает ваш Mac.";
 
 /* macOS Bluetooth permission prompt. */
 "NSBluetoothAlwaysUsageDescription" = "ONE DESK использует Bluetooth только для чтения заряда подключённых периферийных устройств. Ничего не покидает ваш Mac.";
 
 /* macOS Microphone permission prompt. */
-"NSMicrophoneUsageDescription" = "ONE DESK записывает микрофон, только когда вы включаете его для записи экрана. Звук остаётся на вашем Mac, если только вы не создадите временную ссылку.";
 
 /* macOS Camera permission prompt. */
 "NSCameraUsageDescription" = "ONE DESK показывает вашу камеру только в открытом вами окне предпросмотра, чтобы вы могли проверить, как выглядите перед звонком. Ничего не записывается и не покидает ваш Mac.";
