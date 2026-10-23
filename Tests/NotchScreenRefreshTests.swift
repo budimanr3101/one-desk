@@ -442,9 +442,10 @@ enum NotchScreenRefreshContract {
         suite.expect(physical.geometry.compactSideRoom == 64 && physical.presentations == 0,
                "the physical camera retains its existing presentation during app changes")
 
+        let readsBeforeEyes = physical.reads
         physical.eyesWantsRoom = true
         physical.syncMenuSpaceMonitoring()
-        suite.expect(physical.menuSpaceTimer != nil && physical.reads == 1,
+        suite.expect(physical.menuSpaceTimer != nil && physical.reads == readsBeforeEyes + 1,
                      "Notch Eyes uses the existing menu-space reader when menu coverage is disabled")
         physical.eyesWantsRoom = false
         physical.syncMenuSpaceMonitoring()

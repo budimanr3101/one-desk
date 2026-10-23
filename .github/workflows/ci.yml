@@ -34,7 +34,7 @@ jobs:
           set -euo pipefail
           ./build.sh 2>&1 | tee ci-results/build.log
           file build/ONEDESK | tee ci-results/binary.txt
-          lipo -verify_arch arm64 build/ONEDESK
+          lipo build/ONEDESK -verify_arch arm64
           codesign --verify --deep --strict 'build/stage/ONE DESK.app'
           ditto -c -k --sequesterRsrc --keepParent 'build/stage/ONE DESK.app' build/ONE-DESK-app.zip
       - uses: actions/upload-artifact@v7.0.2
