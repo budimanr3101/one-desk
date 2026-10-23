@@ -471,7 +471,8 @@ final class NotchService: ObservableObject {
 
     /// Ghost is larger than the eye strip, but uses the same host and priority gate.
     func ghostSurface(on geometry: NotchGeometry) -> CGSize? {
-        guard eyesShow(on: geometry), UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) == "ghost",
+        guard NotchPetProfile.isActive(), mascotShows(on: geometry), compactActivity == nil, notice == nil,
+              !expanded, !peeking, !suspended, !hiddenInFullscreen, !hiddenUntilHover,
               NotchGhostAssets.isInstalled else { return nil }
         let dimension = NotchGhostSupport.dimension(UserDefaults.standard.double(forKey: DefaultsKey.notchPetSize),
                                                    sideRoom: geometry.compactSideRoom)
@@ -4800,14 +4801,20 @@ extension NotchService {
     }
 
     /// Where it rests in the closed island.
-    private var mascotClosedTrack: NotchMascotTrack {
-        NotchMascotSupport.track(stripWidth: geometry.collapsed.width, stripHeight: geometry.stripHeight,
-                                 wing: geometry.restingWingWidth, cameraWidth: geometry.cameraWidth,
-                                 floats: false, bodyHeight: geometry.stripBodyHeight, side: mascotSide)
+    func restingCharacterTrack(on geometry: NotchGeometry) -> NotchMascotTrack {
+        let surface = ghostSurface(on: geometry)
+        let width = surface?.width ?? geometry.collapsed.width
+        let height = surface?.height ?? geometry.stripHeight
+        let size = surface.map { $0.height - 8 }
+        return NotchMascotSupport.track(stripWidth: width, stripHeight: height,
+            wing: surface == nil ? geometry.restingWingWidth : max(0, (width - geometry.cameraWidth) / 2),
+            cameraWidth: geometry.cameraWidth, floats: surface != nil && geometry.floats,
+            bodyHeight: surface == nil ? geometry.stripBodyHeight : height, side: mascotSide, sizeOverride: size)
     }
+    private var mascotClosedTrack: NotchMascotTrack { restingCharacterTrack(on: geometry) }
 
     /// Its centre's offset from the camera's where it rests closed.
-    private var mascotClosedOffset: CGFloat { mascotClosedTrack.rest - geometry.collapsed.width / 2 }
+    private var mascotClosedOffset: CGFloat { mascotClosedTrack.rest - (ghostSurface(on: geometry)?.width ?? geometry.collapsed.width) / 2 }
 
     /// The companion moved to the camera's other side in Settings: from where
     /// it rested it goes behind the camera, across, and out on the new side.

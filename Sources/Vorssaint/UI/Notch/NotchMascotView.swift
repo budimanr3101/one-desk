@@ -31,6 +31,9 @@ enum NotchMascotCue: Equatable {
 /// flipped view does.
 final class NotchMascotRig: NSObject {
     let root = CALayer()
+    private let ghost = NotchGhostRig()
+    private var rendersGhost = false
+    var ghostOverride: Bool?
     private(set) var look = NotchMascotLook.standard
     private(set) var size: CGFloat = 0
     private(set) var mood = NotchMascotMood.idle
@@ -73,6 +76,7 @@ final class NotchMascotRig: NSObject {
         hopper.addSublayer(squasher)
         squasher.addSublayer(tilter)
         for layer in [ears, antenna, bulb, fill, visor, shine] { tilter.addSublayer(layer) }
+        tilter.addSublayer(ghost.root)
         tilter.addSublayer(attention)
         attention.addSublayer(face)
         face.addSublayer(leftEye)
@@ -98,14 +102,23 @@ final class NotchMascotRig: NSObject {
     /// Draws the companion at `size` points with `look`. Nothing moves, and a
     /// new look at the same size cross-fades in, as a choice in Settings does.
     func configure(look: NotchMascotLook, size: CGFloat, contentsScale scale: CGFloat) {
-        guard !configured || look != self.look || size != self.size || scale != root.contentsScale else { return }
+        let useGhost = ghostOverride ?? NotchPetProfile.isActive()
+        let skinChanged = rendersGhost != useGhost
+        rendersGhost = useGhost
+        ghost.configure(active: useGhost, size: size, scale: scale, reduceMotion: reduceMotion)
+        guard !configured || skinChanged || look != self.look || size != self.size || scale != root.contentsScale else { return }
         let restyled = configured && look != self.look && size == self.size && !reduceMotion
         configured = true
         self.look = look
         self.size = size
         CATransaction.begin()
         CATransaction.setDisableActions(true)
-        defer { CATransaction.commit() }
+        defer {
+            if rendersGhost {
+                for layer in [ears, antenna, bulb, fill, visor, shine, attention, face] { layer.isHidden = true }
+            } else { fill.isHidden = false; attention.isHidden = false; face.isHidden = false }
+            CATransaction.commit()
+        }
         if restyled {
             let fade = CATransition()
             fade.type = .fade
@@ -167,6 +180,7 @@ final class NotchMascotRig: NSObject {
     // MARK: Faces
 
     func setMood(_ mood: NotchMascotMood, animated: Bool) {
+        if rendersGhost { ghost.play(NotchPetProfile.action(for: mood)) }
         guard mood != self.mood else { return }
         let previous = self.mood
         self.mood = mood
@@ -267,6 +281,7 @@ final class NotchMascotRig: NSObject {
 
     /// Back to its own face at rest, with every motion taken off.
     func reset(to mood: NotchMascotMood) {
+        if rendersGhost { ghost.play(NotchPetProfile.action(for: mood)) }
         stopBlinking()
         for layer in [root, hopper, squasher, tilter, attention, face, leftEye, rightEye] { layer.removeAllAnimations() }
         attention.transform = CATransform3DIdentity
@@ -495,6 +510,7 @@ final class NotchMascotRig: NSObject {
     /// keeps. `lift` is how high a hop may take it where it stands. With
     /// Reduce Motion it only changes face.
     func react(_ reaction: NotchMascotReaction, lift: CGFloat) {
+        if rendersGhost { ghost.play(NotchPetProfile.action(for: reaction)) }
         guard size > 0 else { return }
         // Whatever it is, it wakes up for it.
         if dozed, reaction != .wakeUp { setMood(.idle, animated: !reduceMotion) }
@@ -666,6 +682,10 @@ final class NotchMascotRig: NSObject {
     func playVisit(_ path: NotchMascotPath, greeting: NotchMascotMood, baseline: CGFloat, stand: CGPoint,
                    start: CFTimeInterval, holdsEnd: Bool = false) {
         guard size > 0, path.duration > 0, path.x.count == path.keyTimes.count else { return }
+        if rendersGhost {
+            ghost.play((path.x.last ?? 0) >= (path.x.first ?? 0) ? .right : .left,
+                       hold: path.duration, then: NotchPetProfile.action(for: greeting))
+        }
         let now = CACurrentMediaTime()
         // One that already ended out of sight still holds its last frame
         // for a strip drawn after it, until the island moves on.
@@ -733,7 +753,8 @@ final class NotchMascotRig: NSObject {
 
     /// Blinks wait while the layer is out of sight, and `visible` resumes them.
     func setIdles(_ idles: Bool, visible: Bool) {
-        let wanted = idles && visible
+        ghost.setVisible(visible)
+        let wanted = idles && visible && !rendersGhost
         guard wanted != self.idles else { return }
         self.idles = wanted
         if !wanted {
@@ -1070,7 +1091,8 @@ final class NotchMascotHostView: NSView {
     }
 
     func configure(look: NotchMascotLook, size: CGFloat, mood: NotchMascotMood, idles: Bool,
-                   reduceMotion: Bool, animated: Bool) {
+                   reduceMotion: Bool, animated: Bool, ghostOverride: Bool? = nil) {
+        mascot.ghostOverride = ghostOverride
         mascot.reduceMotion = reduceMotion
         let shift = figureShift
         mascot.configure(look: look, size: size, contentsScale: backingScale)
@@ -1200,7 +1222,8 @@ struct NotchMascotView: NSViewRepresentable {
         let view = NotchMascotHostView(frame: CGRect(x: 0, y: 0, width: size, height: size))
         view.followsDrag = followsDrag
         view.configure(look: look, size: size, mood: mood, idles: idles,
-                       reduceMotion: context.environment.accessibilityReduceMotion, animated: false)
+                       reduceMotion: context.environment.accessibilityReduceMotion, animated: false,
+                       ghostOverride: context.environment.notchGhostOverride)
         if let reaction {
             // Small in a notice, it hops a little higher for its size to read.
             view.react(NotchMascotReactionEvent(id: UUID(), reaction: reaction, start: CACurrentMediaTime()),
@@ -1211,7 +1234,8 @@ struct NotchMascotView: NSViewRepresentable {
 
     func updateNSView(_ view: NotchMascotHostView, context: Context) {
         view.configure(look: look, size: size, mood: mood, idles: idles,
-                       reduceMotion: context.environment.accessibilityReduceMotion, animated: true)
+                       reduceMotion: context.environment.accessibilityReduceMotion, animated: true,
+                       ghostOverride: context.environment.notchGhostOverride)
         view.place(at: nil, visible: nil)
         if let cue { view.play(cue, id: cueID) }
     }
@@ -1244,7 +1268,8 @@ struct NotchMascotTrackView: NSViewRepresentable {
 
     func updateNSView(_ view: NotchMascotHostView, context: Context) {
         view.configure(look: look, size: track.size, mood: awake ? mood : .sleepy, idles: rests && awake,
-                       reduceMotion: context.environment.accessibilityReduceMotion, animated: true)
+                       reduceMotion: context.environment.accessibilityReduceMotion, animated: true,
+                       ghostOverride: context.environment.notchGhostOverride)
         // Off stage at the far end once a visit is over, so nothing jumps
         // when its last frame hands back to where it stands.
         let x = rests ? track.rest : track.mirrored ? -track.size * 2 : track.width + track.size * 2

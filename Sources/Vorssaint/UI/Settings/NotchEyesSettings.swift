@@ -13,6 +13,17 @@ struct NotchEyesSettings: View {
     @AppStorage(DefaultsKey.notchPetSize) private var petSize = 52.0
     @AppStorage(DefaultsKey.notchPetAnimations) private var petAnimations = true
     @AppStorage(DefaultsKey.notchPetAssetRevision) private var revision = ""
+    @ObservedObject private var l10n = L10n.shared
+    @AppStorage(DefaultsKey.notchPetSide) private var side = "left"
+    @AppStorage(DefaultsKey.notchPetHidesWhenIdle) private var hides = false
+    @AppStorage(DefaultsKey.notchPetVisits) private var visits = true
+    @AppStorage(DefaultsKey.notchPetVisitFrequency) private var frequency = "normal"
+    @AppStorage(DefaultsKey.notchPetReactions) private var reactions = true
+    @AppStorage(DefaultsKey.notchPetCommandBar) private var commandBar = true
+    @AppStorage(DefaultsKey.notchPetCommandBarStyle) private var commandBarStyle = "droplet"
+    private var behaviorRevision: String {
+        "\(side)|\(hides)|\(visits)|\(frequency)|\(reactions)|\(commandBar)|\(commandBarStyle)|\(petAnimations)"
+    }
     @State private var installed = NotchGhostAssets.isInstalled
     @State private var downloading = false
     @State private var failure: String?
@@ -32,6 +43,13 @@ struct NotchEyesSettings: View {
                     if installed {
                         NotchGhostView().frame(width: 96, height: 96)
                             .padding(12).background(.black, in: RoundedRectangle(cornerRadius: 14))
+                        NotchMascotStageCard(look: NotchMascotSupport.look(),
+                            side: NotchMascotSide(rawValue: side) ?? .left,
+                            awake: enabled, canGreet: enabled && NotchSupport.isEnabled(),
+                            visits: visits, reactions: reactions, hides: hides,
+                            text: FeatureStrings.notchMascot(l10n.language), language: l10n.language)
+                            .environment(\.notchGhostOverride, true)
+                        behavior
                         Text("Pet size"); Slider(value: $petSize, in: 32...72, step: 2)
                         Toggle("Animate pet actions", isOn: $petAnimations)
                     }
@@ -61,13 +79,47 @@ struct NotchEyesSettings: View {
                     Toggle("Natural blinking", isOn: $blink)
                     Toggle("Idle gaze", isOn: $idle)
                 }
-                Text("Select None for island idle content and turn Companion off. The pet yields to activities, notifications and interaction. Crowded menu bars can limit its size.")
+                Text("Select None for island idle content to show the resting pet. Ghost uses Companion visits, reactions and Command Bar, with its own settings. Selecting Ghost takes priority over the classic Companion. Crowded menus can limit its size.")
                     .font(.caption).foregroundStyle(.secondary)
             }.padding(8)
                 .onChange(of: enabled) { _, _ in sync() }
                 .onChange(of: style) { _, _ in sync() }
+                .onChange(of: behaviorRevision) { _, _ in sync() }
                 .onChange(of: petSize) { _, _ in sync() }
                 .onDisappear { downloadTask?.cancel(); downloadTask = nil }
+        }
+    }
+    private var behavior: some View {
+        let text = FeatureStrings.notchMascot(l10n.language)
+        return VStack(alignment: .leading, spacing: 12) {
+            GroupBox(text.behavior) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Picker(text.side, selection: $side) {
+                        ForEach(NotchMascotSide.allCases) { Text(text.side($0)).tag($0.rawValue) }
+                    }.pickerStyle(.segmented)
+                    Toggle(text.hidesWhenIdle, isOn: $hides)
+                    Text(text.hidesWhenIdleHint).font(.caption).foregroundStyle(.secondary)
+                    Toggle(text.visits, isOn: $visits)
+                    if visits {
+                        Picker(text.frequency, selection: $frequency) {
+                            ForEach(NotchMascotVisitFrequency.allCases) { Text(text.frequency($0)).tag($0.rawValue) }
+                        }.pickerStyle(.segmented)
+                    }
+                    Toggle(text.reactions, isOn: $reactions)
+                    Text(text.reactionsHint).font(.caption).foregroundStyle(.secondary)
+                }.padding(8)
+            }
+            GroupBox("Command Bar") {
+                VStack(alignment: .leading, spacing: 12) {
+                    SettingsFeatureSwitchRow(symbol: "command", title: text.commandBar,
+                        caption: text.commandBarHint, isOn: $commandBar, feature: .commandBar)
+                    if commandBar {
+                        Picker(text.opensAs, selection: $commandBarStyle) {
+                            ForEach(NotchCommandBarStyle.allCases) { Text(text.commandBarStyle($0)).tag($0.rawValue) }
+                        }.pickerStyle(.segmented)
+                    }
+                }.padding(8)
+            }
         }
     }
     private func sync() { NotchService.shared.syncWithPreferences() }

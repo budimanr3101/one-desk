@@ -1,6 +1,6 @@
 # ONE DESK validation
 
-Status: **foundation CI passed; new Ghost pet implementation awaits native CI; physical-Mac testing pending**.
+Status: **previous Ghost CI passed; Companion behavior integration awaits native CI and physical-Mac testing**.
 Do not interpret source parsing or upstream CI as proof that ONE DESK compiles,
 passes unit tests, renders smoothly, or works on physical hardware.
 
@@ -169,3 +169,16 @@ On the M2 Air and at least one external display:
 8. Repeat key clipboard, shelf, window management, switcher, screenshot/recording,
    metrics, mixer, brightness and existing self-test/regression paths with their
    normal permissions. CI success would not substitute for this checklist.
+
+## Companion-style Ghost behavior (2026-10-23)
+
+Previous Ghost build passed all five jobs in [run 39914219242](https://github.com/budimanr3101/one-desk/actions/runs/39914219242).
+That result predates the new Companion behavior integration. New source/profile
+tests, preference routing, shared preview and sprite rig require another native
+build. Linux checks include Swift source parsing, generated test sources, build
+script syntax, workflow lint, preference cleanup and diff hygiene. No Swift compiler
+is available here. New build, self-test, unit tests and packaging remain pending CI.
+On a Mac verify left/right movement, idle hide/visit wake, each preview/event
+reaction, music/timer/download reactions, both Command Bar styles, Reduce Motion,
+multi-display/fullscreen and switching back to classic Companion. Visual smoothness
+and hardware behavior have not been verified by the developer.

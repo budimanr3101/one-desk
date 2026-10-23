@@ -4,6 +4,55 @@ import Foundation
 
 enum NotchGhostTests {
     static func run(_ suite: TestSuite) {
+        let domain = "com.onedesk.tests.ghost-profile"
+        let defaults = UserDefaults(suiteName: domain)!
+        defaults.removePersistentDomain(forName: domain)
+        defer { defaults.removePersistentDomain(forName: domain) }
+        for feature in [AppFeature.notch, .notchEyes, .notchMascot, .commandBar] {
+            defaults.set(true, forKey: feature.availabilityKey)
+        }
+        defaults.set(true, forKey: DefaultsKey.notchEnabled)
+        defaults.set(true, forKey: DefaultsKey.notchEyesEnabled)
+        defaults.set("ghost", forKey: DefaultsKey.notchEyesStyle)
+        defaults.set("fixture", forKey: DefaultsKey.notchPetAssetRevision)
+        defaults.set(false, forKey: DefaultsKey.notchMascotEnabled)
+        defaults.set("left", forKey: DefaultsKey.notchMascotSide)
+        defaults.set("right", forKey: DefaultsKey.notchPetSide)
+        defaults.set(true, forKey: DefaultsKey.notchPetVisits)
+        defaults.set(true, forKey: DefaultsKey.notchPetReactions)
+        defaults.set(true, forKey: DefaultsKey.notchPetHidesWhenIdle)
+        defaults.set("frequent", forKey: DefaultsKey.notchPetVisitFrequency)
+        defaults.set(true, forKey: DefaultsKey.notchPetCommandBar)
+        defaults.set("island", forKey: DefaultsKey.notchPetCommandBarStyle)
+        suite.expect(NotchMascotSupport.isEnabled(in: defaults), "Ghost activates the shared lifecycle independently of classic Companion")
+        suite.expect(NotchMascotSupport.side(in: defaults) == .right
+            && NotchMascotSupport.visits(in: defaults) && NotchMascotSupport.reacts(in: defaults)
+            && NotchMascotSupport.hidesWhenIdle(in: defaults)
+            && NotchMascotSupport.visitFrequency(in: defaults) == .frequent,
+            "Ghost routes independent side, visits, reactions and hiding preferences")
+        suite.expect(NotchMascotSupport.commandBarStyle(in: defaults) == .island,
+                     "Ghost uses its own Command Bar presentation")
+        defaults.set(false, forKey: DefaultsKey.notchPetCommandBar)
+        suite.expect(NotchMascotSupport.commandBarStyle(in: defaults) == nil, "Ghost can opt out of Command Bar")
+        defaults.set(false, forKey: DefaultsKey.notchEyesEnabled)
+        suite.expect(!NotchMascotSupport.isEnabled(in: defaults), "disabling Ghost stops the shared runtime when classic Companion is off")
+        defaults.set(true, forKey: DefaultsKey.notchMascotEnabled)
+        suite.expect(NotchMascotSupport.side(in: defaults) == .left, "disabling Ghost restores preserved classic preferences")
+        defaults.set(true, forKey: DefaultsKey.notchEyesEnabled)
+        defaults.set(false, forKey: AppFeature.notchEyes.availabilityKey)
+        suite.expect(!NotchPetProfile.isActive(in: defaults), "removing the Ghost feature releases its presentation")
+        defaults.set(true, forKey: AppFeature.notchEyes.availabilityKey)
+        defaults.set("", forKey: DefaultsKey.notchPetAssetRevision)
+        suite.expect(!NotchPetProfile.isActive(in: defaults), "an undownloaded Ghost never replaces Companion")
+        for reaction in NotchMascotReaction.allCases {
+            suite.expect(NotchPetProfile.action(for: reaction).frameCount > 0, "every Companion reaction has a Ghost animation")
+        }
+        for mood in NotchMascotMood.allCases {
+            suite.expect(NotchPetProfile.action(for: mood).frameCount > 0, "every Companion mood has a Ghost animation")
+        }
+        let track = NotchMascotSupport.track(stripWidth: 300, stripHeight: 60, wing: 60,
+            cameraWidth: 180, floats: false, bodyHeight: 60, side: .right, sizeOverride: 52)
+        suite.expect(track.size == 52, "resting Ghost retains its larger size in the Companion track")
         for action in NotchGhostAction.allCases {
             suite.expect(action.duration > 0 && action.duration < 2, "Ghost actions have bounded timing")
             for frame in 0..<action.frameCount {

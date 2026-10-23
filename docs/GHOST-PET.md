@@ -4,21 +4,27 @@ Ghost is an optional appearance of the existing Notch Eyes feature. Select
 Settings → Features → Notch Eyes, open its settings tab, choose **Ghost · Petdex**,
 and click **Download Ghost from Petdex**. Alternatively, import the original
 `spritesheet.webp` from the Ghost package. Keep the island enabled, choose **None**
-as idle content and disable Companion. No mouse tracking is installed in Ghost mode.
+as idle content to see its resting pose. Selecting an installed Ghost automatically
+uses it in the original Companion runtime instead of the purple character. Classic
+Companion settings are preserved and resume when Ghost is disabled. No desktop
+mouse tracking is installed in Ghost mode.
 
-The default size is 52 points, configurable from 32–72. Available menu-bar space
-can cap it. The existing island host reserves a taller resting surface for the
-whole pet, positioned beside the physical camera. On a floating capsule it is
-centered. Existing notifications, activities, Companion and interaction retain
-priority. This is decorative animation: actions do not claim to report actual
-coding-agent or shell activity.
+Ghost now has independent Companion-style settings: camera side, hide after idle,
+periodic visits with three frequencies, reactions to real island activities, and
+Command Bar with Drop/Open island presentation. The shared interactive stage
+provides Say Hi and the same reaction preview buttons. The actual activity events,
+visits, idle hiding, transitions and Command Bar routing use the upstream engine.
+Ghost maps the available sprite rows to those moods/reactions; it does not invent
+additional artwork. Its default resting size is 52 points (32–72 configurable),
+limited by available menu space. Activity and Command Bar faces use their existing
+compact geometry.
 
-Idle animation is followed periodically by a wave, jump, walk or expression, using
-Ghost's actual frame counts. Blank trailing cells are excluded. Core Animation
-plays the image sequence; a single cancellable delayed task selects the next
-activity. No frame-rendering timer, cursor monitor or SwiftUI per-frame state is
-used. Disable animations or enable Reduce Motion for a static idle frame. Removal
-of the view cancels loading, scheduled actions and layer animations.
+`NotchPetProfile` selects pet preferences without overwriting classic preferences.
+`NotchGhostRig` attaches a sprite layer inside the original Companion rig, retaining
+its hopper, squasher, visit paths, clipping and native window host. Original window
+animation timings are unchanged. Frame sequences run in Core Animation, decode off
+the UI thread, respect Reduce Motion, and stop while invisible. Scheduled reaction
+resets and loading are cancelled on teardown. No rendering timer is added.
 
 ## Asset provenance and distribution
 
@@ -49,7 +55,9 @@ no network access to Petdex.
 Static Swift parsing, test-source generation, build-script syntax and workflow
 linting are run in Linux. New tests cover atlas bounds, valid frame counts,
 size/space constraints, larger native surface reservation, backup policy and
-rejection of unverified image data. Native compilation, these new tests, actual
+rejection of unverified image data. Added profile tests cover independent preferences,
+classic restoration, feature disable/removal, Command Bar opt-out, reaction/mood
+mapping and larger Companion tracks. Native compilation, these new tests, actual
 web-download behavior on macOS and visual/hardware appearance require the new CI
 run and subsequent real-Mac testing. The previous successful foundation CI does
 not validate this new Ghost implementation.

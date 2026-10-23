@@ -7,6 +7,13 @@ import Foundation
 
 /// Every UserDefaults key used by the app, in one place.
 enum DefaultsKey {
+    static let notchPetSide = "notchPetSide"
+    static let notchPetHidesWhenIdle = "notchPetHidesWhenIdle"
+    static let notchPetVisits = "notchPetVisits"
+    static let notchPetVisitFrequency = "notchPetVisitFrequency"
+    static let notchPetReactions = "notchPetReactions"
+    static let notchPetCommandBar = "notchPetCommandBar"
+    static let notchPetCommandBarStyle = "notchPetCommandBarStyle"
     static let notchPetSize = "notchPetSize"
     static let notchPetAnimations = "notchPetAnimations"
     static let notchPetAssetRevision = "notchPetAssetRevision"
@@ -1198,6 +1205,13 @@ enum Defaults {
     static let allowedMonitorAlertCooldowns = [2, 5, 15, 30, 60]
 
     static let registeredDefaults: [String: Any] = [
+        DefaultsKey.notchPetSide: "left",
+        DefaultsKey.notchPetHidesWhenIdle: false,
+        DefaultsKey.notchPetVisits: true,
+        DefaultsKey.notchPetVisitFrequency: "normal",
+        DefaultsKey.notchPetReactions: true,
+        DefaultsKey.notchPetCommandBar: true,
+        DefaultsKey.notchPetCommandBarStyle: "droplet",
         DefaultsKey.notchPetSize: 52.0,
         DefaultsKey.notchPetAnimations: true,
         DefaultsKey.notchPetAssetRevision: "",

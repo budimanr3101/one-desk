@@ -755,13 +755,7 @@ struct NotchRestingStrip: View {
                 } else { Color.clear }
             }
             if eyesEnabled, features.isAvailable(.notchEyes), service.eyesShow(on: geometry) {
-                if let surface = ghostSurface {
-                    NotchGhostView()
-                        .frame(width: ghostDimension, height: ghostDimension)
-                        .offset(x: geometry.floats ? 0 : geometry.cameraWidth / 2 + ghostDimension / 2 + 4)
-                        .frame(width: surface.width, height: surface.height)
-                        .allowsHitTesting(false)
-                } else if eyeStyle != "ghost" {
+                if eyeStyle != "ghost" {
                     NotchEyesView(cameraWidth: geometry.cameraWidth, wingWidth: geometry.restingWingWidth)
                         .frame(width: geometry.collapsed.width, height: geometry.stripHeight)
                         .allowsHitTesting(false)
@@ -769,16 +763,11 @@ struct NotchRestingStrip: View {
             }
             if service.mascotShows(on: geometry) {
                 NotchMascotTrackView(look: NotchMascotSupport.look(),
-                                     track: NotchMascotSupport.track(stripWidth: geometry.collapsed.width,
-                                                                     stripHeight: geometry.stripHeight,
-                                                                     wing: geometry.restingWingWidth,
-                                                                     cameraWidth: geometry.cameraWidth, floats: false,
-                                                                     bodyHeight: geometry.stripBodyHeight,
-                                                                     side: service.mascotSide),
+                                     track: service.restingCharacterTrack(on: geometry),
                                      rests: service.mascotAtRest, visit: service.mascotVisit,
                                      mood: service.mascotRestingMood, reaction: service.mascotReaction,
                                      yieldsToActivities: true)
-                    .frame(width: geometry.collapsed.width, height: geometry.stripHeight)
+                    .frame(width: ghostSurface?.width ?? geometry.collapsed.width, height: ghostSurface?.height ?? geometry.stripHeight)
                     // The window's own layer shows it while the island closes around it.
                     .opacity(service.mascotBridging && displayGeometry == nil ? 0 : 1)
                     .animation(nil, value: service.mascotBridging)

@@ -565,6 +565,7 @@ if (( TEST )); then
         Sources/Vorssaint/Services/Uninstall/UninstallerSupport.swift
         Sources/Vorssaint/Services/ManagedDownloads/WhatsAppDownloadSupport.swift
         Sources/Vorssaint/Services/Notch/NotchGhostAssets.swift
+        Sources/Vorssaint/Services/Notch/NotchPetProfile.swift
         Sources/Vorssaint/Services/Notch/NotchGhostSupport.swift
         Sources/Vorssaint/Services/Notch/NotchEyesSupport.swift
         Sources/Vorssaint/Core/SecureInputSupport.swift

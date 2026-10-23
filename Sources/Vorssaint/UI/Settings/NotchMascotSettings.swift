@@ -63,6 +63,7 @@ struct NotchMascotSettings: View {
             }
             .padding(embedded ? [.bottom] : .all, 22)
         }
+        .environment(\.notchGhostOverride, false)
     }
 
     private var header: some View {
@@ -266,7 +267,7 @@ struct NotchMascotSettings: View {
 /// blinks, its eyes follow the pointer, a moment's rest of the pointer on it
 /// pets it, and it acts out a visit or a moment on request. Switched off,
 /// it sleeps.
-private struct NotchMascotStageCard: View {
+struct NotchMascotStageCard: View {
     let look: NotchMascotLook
     let side: NotchMascotSide
     let awake: Bool

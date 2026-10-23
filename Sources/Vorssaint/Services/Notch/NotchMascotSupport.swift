@@ -1231,32 +1231,33 @@ enum NotchMascotSupport {
 
     /// Installed on the Features page, switched on, and in an island that is on.
     static func isEnabled(in defaults: UserDefaults = .standard) -> Bool {
-        AppFeature.notchMascot.isAvailable(in: defaults) && NotchSupport.isEnabled(in: defaults)
-            && defaults.bool(forKey: DefaultsKey.notchMascotEnabled)
+        NotchPetProfile.isActive(in: defaults)
+            || (AppFeature.notchMascot.isAvailable(in: defaults) && NotchSupport.isEnabled(in: defaults)
+                && defaults.bool(forKey: DefaultsKey.notchMascotEnabled))
     }
 
     static func visits(in defaults: UserDefaults = .standard) -> Bool {
-        isEnabled(in: defaults) && defaults.bool(forKey: DefaultsKey.notchMascotVisits)
+        isEnabled(in: defaults) && defaults.bool(forKey: NotchPetProfile.key(DefaultsKey.notchPetVisits, DefaultsKey.notchMascotVisits, in: defaults))
     }
 
     /// Whether it comes out to react to what the island sees, and watches a
     /// countdown run out.
     static func reacts(in defaults: UserDefaults = .standard) -> Bool {
-        isEnabled(in: defaults) && defaults.bool(forKey: DefaultsKey.notchMascotReactions)
+        isEnabled(in: defaults) && defaults.bool(forKey: NotchPetProfile.key(DefaultsKey.notchPetReactions, DefaultsKey.notchMascotReactions, in: defaults))
     }
 
     /// Whether it hides in the island once nothing has happened for a
     /// while, and comes out only to visit or to react.
     static func hidesWhenIdle(in defaults: UserDefaults = .standard) -> Bool {
-        isEnabled(in: defaults) && defaults.bool(forKey: DefaultsKey.notchMascotHidesWhenIdle)
+        isEnabled(in: defaults) && defaults.bool(forKey: NotchPetProfile.key(DefaultsKey.notchPetHidesWhenIdle, DefaultsKey.notchMascotHidesWhenIdle, in: defaults))
     }
 
     static func visitFrequency(in defaults: UserDefaults = .standard) -> NotchMascotVisitFrequency {
-        NotchMascotVisitFrequency(rawValue: defaults.string(forKey: DefaultsKey.notchMascotVisitFrequency) ?? "") ?? .normal
+        NotchMascotVisitFrequency(rawValue: defaults.string(forKey: NotchPetProfile.key(DefaultsKey.notchPetVisitFrequency, DefaultsKey.notchMascotVisitFrequency, in: defaults)) ?? "") ?? .normal
     }
 
     static func side(in defaults: UserDefaults = .standard) -> NotchMascotSide {
-        NotchMascotSide(rawValue: defaults.string(forKey: DefaultsKey.notchMascotSide) ?? "") ?? .left
+        NotchMascotSide(rawValue: defaults.string(forKey: NotchPetProfile.key(DefaultsKey.notchPetSide, DefaultsKey.notchMascotSide, in: defaults)) ?? "") ?? .left
     }
 
     static func look(in defaults: UserDefaults = .standard) -> NotchMascotLook {
@@ -1270,8 +1271,8 @@ enum NotchMascotSupport {
     /// its own window as it always has.
     static func commandBarStyle(in defaults: UserDefaults = .standard) -> NotchCommandBarStyle? {
         guard isEnabled(in: defaults), AppFeature.commandBar.isAvailable(in: defaults),
-              defaults.bool(forKey: DefaultsKey.notchCommandBar) else { return nil }
-        return NotchCommandBarStyle(rawValue: defaults.string(forKey: DefaultsKey.notchCommandBarStyle) ?? "") ?? .droplet
+              defaults.bool(forKey: NotchPetProfile.key(DefaultsKey.notchPetCommandBar, DefaultsKey.notchCommandBar, in: defaults)) else { return nil }
+        return NotchCommandBarStyle(rawValue: defaults.string(forKey: NotchPetProfile.key(DefaultsKey.notchPetCommandBarStyle, DefaultsKey.notchCommandBarStyle, in: defaults)) ?? "") ?? .droplet
     }
 
     /// What the bar's face shows for what is typed. Results get a hop of
@@ -1328,14 +1329,14 @@ enum NotchMascotSupport {
     /// has no camera, so it rests in the middle whatever the side.
     static func track(stripWidth: CGFloat, stripHeight: CGFloat, wing: CGFloat,
                       cameraWidth: CGFloat, floats: Bool, bodyHeight: CGFloat,
-                      side: NotchMascotSide = .left) -> NotchMascotTrack {
+                      side: NotchMascotSide = .left, sizeOverride: CGFloat? = nil) -> NotchMascotTrack {
         if floats {
-            let size = self.size(stripHeight: bodyHeight, floats: true)
+            let size = sizeOverride.map { min($0, max(10, bodyHeight - 6)) } ?? self.size(stripHeight: bodyHeight, floats: true)
             return NotchMascotTrack(width: stripWidth, height: stripHeight, size: size, rest: stripWidth / 2,
                                     hidden: nil, baseline: stripHeight / 2,
                                     ceiling: max(0, (stripHeight - bodyHeight) / 2))
         }
-        let size = self.size(stripHeight: stripHeight, floats: false)
+        let size = sizeOverride.map { min($0, max(12, stripHeight - 8)) } ?? self.size(stripHeight: stripHeight, floats: false)
         let gap = max(4, min(8, wing - size - 6))
         let rest = max(size / 2, wing - gap - size / 2)
         return NotchMascotTrack(width: stripWidth, height: stripHeight, size: size,

@@ -104,3 +104,13 @@ The original release and issue automation are archived as `.disabled` documentat
 under `docs/upstream/`. Active workflows cannot publish releases, access the upstream
 protected signing environment or send issue notifications. App self-update entry
 points are gated off. Upstream-hosted uploads/feedback are not used.
+
+## Ghost as a Companion presentation
+
+NotchPetProfile routes independent pet preferences into the existing Companion
+policy and lifecycle. NotchGhostRig adds a sprite skin inside NotchMascotRig;
+existing visit paths, reactions, activity subscriptions, hide scheduling, Command
+Bar and bridge motion remain the owners of behavior. Only optional sprite hooks
+and a size override were added to the native rig/track. Classic geometry defaults
+are unchanged. NotchWindowHost was not modified. Ghost takes presentation priority
+when installed and enabled; disabling it restores the classic settings.
