@@ -453,6 +453,8 @@ final class NotchService: ObservableObject {
     /// read this rather than the live preference, so switching it off takes
     /// it away only once its farewell is set up, with no frame between where
     /// it is simply gone.
+    var mascotOn: Bool { mascotWasEnabled ?? false }
+
     /// Decorative content reserves existing wings only; animation timelines stay unchanged.
     func eyesShow(on geometry: NotchGeometry) -> Bool {
         NotchEyesSupport.visible(
@@ -465,7 +467,10 @@ final class NotchService: ObservableObject {
             && (geometry.floats || geometry.restingWingWidth > 0)
     }
 
-    var mascotOn: Bool { mascotWasEnabled ?? false }
+    private var eyesWantsRoom: Bool {
+        AppFeature.notchEyes.isAvailable && UserDefaults.standard.bool(forKey: DefaultsKey.notchEyesEnabled)
+            && idleContent == .none && !mascotOn
+    }
 
     /// The camera side it rests on, as the island last synced it, so a side
     /// changed in Settings moves it only together with the stroll across.
@@ -3273,7 +3278,7 @@ final class NotchService: ObservableObject {
         // room when one comes.
         let wanted = running && !suspended && (!hiddenUntilHover || NotchSupport.hiddenShowsActivity())
             && !expanded && captureControls == nil
-            && (idleContent != .none || compactActivity != nil || !geometry.isNotched || mascotWantsRoom)
+            && (idleContent != .none || compactActivity != nil || !geometry.isNotched || mascotWantsRoom || eyesWantsRoom)
         guard wanted else { stopMenuSpaceMonitoring(); return }
         guard menuSpaceTimer == nil else { return }
         let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in self?.readMenuSpace() }

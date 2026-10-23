@@ -109,6 +109,7 @@ enum NotchScreenRefreshContract {
         var idleContent = NotchIdleContent.music
         var compactActivity: Bool?
         var mascotWantsRoom = false
+        var eyesWantsRoom = false
         var accessibilityGranted = true
         var coversMenus = false
         var menuSpaceTimer: Timer?
@@ -440,6 +441,15 @@ enum NotchScreenRefreshContract {
         physical.applicationDidActivate()
         suite.expect(physical.geometry.compactSideRoom == 64 && physical.presentations == 0,
                "the physical camera retains its existing presentation during app changes")
+
+        physical.eyesWantsRoom = true
+        physical.syncMenuSpaceMonitoring()
+        suite.expect(physical.menuSpaceTimer != nil && physical.reads == 1,
+                     "Notch Eyes uses the existing menu-space reader when menu coverage is disabled")
+        physical.eyesWantsRoom = false
+        physical.syncMenuSpaceMonitoring()
+        suite.expect(physical.menuSpaceTimer == nil,
+                     "disabling eyes releases menu-space monitoring when no content needs it")
 
         let noMenuBar = Service()
         noMenuBar.geometry.compactSideRoom = nil
