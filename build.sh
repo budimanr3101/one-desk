@@ -63,7 +63,7 @@ FAN_HELPER_ID="$APP_BUNDLE_ID.fan-control"
 NOW_PLAYING_ADAPTER_ID="$APP_BUNDLE_ID.now-playing"
 NOW_PLAYING_ADAPTER="libVorssaintNowPlaying.dylib"
 TARGET="arm64-apple-macosx14.0"
-ENTITLEMENTS="Resources/Vorssaint.entitlements"
+ENTITLEMENTS="Resources/ONEDESK.entitlements"
 LEGACY_IDENTITY="ONE DESK Local Signing"
 
 developer_id_identity() {

@@ -867,10 +867,11 @@ final class AppUpdatesService: ObservableObject {
     /// package manager replace a running bundle is exactly what that updater
     /// exists to do safely.
     private static func isOwnBundle(_ bundleID: String) -> Bool {
-        bundleID == Bundle.main.bundleIdentifier || bundleID.hasPrefix("com.vorssaint")
+        bundleID == Bundle.main.bundleIdentifier || bundleID == "com.onedesk.app"
+            || bundleID.hasPrefix("com.onedesk.app.")
     }
 
-    private static let ownPackageTokens: Set<String> = ["vorssaint", "vorssaint@beta", "vorssaint-beta"]
+    private static let ownPackageTokens: Set<String> = ["one-desk", "one-desk@beta", "one-desk-beta"]
 
     /// The package manager refreshes its own catalog on the way, which can sit
     /// on a slow network. A ceiling keeps a stalled command from leaving the

@@ -222,7 +222,11 @@ enum NotchMusicVisibilityTests {
             let eyesLayout = Service()
             eyesLayout.geometry = service.geometry
             eyesLayout.eyesVisible = true
-            suite.expect(eyesLayout.surfaceSize == eyesLayout.geometry.collapsed, "eyes reserve resting wings through the existing surface layout")
+            let savedPlayback = reader.playback
+            reader.playback = nil
+            suite.expect(eyesLayout.surfaceSize == eyesLayout.geometry.collapsed,
+                         "eyes reserve resting wings without a competing activity: got \(eyesLayout.surfaceSize), expected \(eyesLayout.geometry.collapsed)")
+            reader.playback = savedPlayback
             defaults.set(NotchIdleContent.music.rawValue, forKey: DefaultsKey.notchIdleContent)
             defaults.set(true, forKey: DefaultsKey.notchShowPlayingMusic)
             reader.playback = .init(isPlaying: true)

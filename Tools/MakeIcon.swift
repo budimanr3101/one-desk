@@ -28,7 +28,7 @@ func deskImage(background: Bool) -> NSImage {
         }
         NSColor.white.setFill()
         NSBezierPath(roundedRect: NSRect(x: 220, y: 570, width: 584, height: 72), xRadius: 24, yRadius: 24).fill()
-        for x in [260, 684] {
+        for x in [CGFloat(260), CGFloat(684)] {
             NSBezierPath(roundedRect: NSRect(x: x, y: 350, width: 80, height: 210), xRadius: 22, yRadius: 22).fill()
         }
         return true

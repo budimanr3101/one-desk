@@ -18,7 +18,6 @@ enum NotchEyesTests {
         let defaults = UserDefaults(suiteName: domain)!
         defaults.removePersistentDomain(forName: domain)
         defer { defaults.removePersistentDomain(forName: domain) }
-        defaults.register(defaults: Defaults.registeredDefaults)
         defaults.set(18.0, forKey: DefaultsKey.notchEyesSize)
         defaults.set(true, forKey: DefaultsKey.notchEyesEnabled)
         suite.expect(defaults.double(forKey: DefaultsKey.notchEyesSize) == 18

@@ -177,7 +177,9 @@ struct ReleaseNotes {
 
     private static func isDistributionFooter(_ line: String) -> Bool {
         let normalized = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        return normalized == "Signed with an Apple Developer ID and notarized by Apple, so it downloads and opens normally. Requires macOS 14 or later. Open the .dmg below and drag ONE DESK to Applications."
+        let prefix = "Signed with an Apple Developer ID and notarized by Apple, so it downloads and opens normally. Requires macOS 14 or later. Open the .dmg below and drag "
+        // Preserve parsing of historical upstream notes alongside fork notes.
+        return ["ONE DESK", "Vorssaint"].contains { normalized == prefix + $0 + " to Applications." }
     }
 }
 

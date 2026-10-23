@@ -6,6 +6,8 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>OneDeskRepositoryURL</key>
+	<string>https://github.com/budimanr3101/one-desk</string>
 	<key>CFBundleDisplayName</key>
 	<string>ONE DESK</string>
 	<key>CFBundleExecutable</key>
