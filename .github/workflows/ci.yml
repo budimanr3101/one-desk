@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  # Match the upstream compatibility baseline; log the actual versions below.
+  DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
 concurrency:
   group: onedesk-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -15,41 +18,41 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - name: Record and verify environment
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p build/validation
-          { uname -a; sw_vers; xcodebuild -version; swiftc --version; xcrun --sdk macosx --show-sdk-version; echo "$GITHUB_SHA"; } | tee build/validation/environment.txt
+          mkdir -p ci-results
+          { uname -a; sw_vers; xcodebuild -version; swiftc --version; xcrun --sdk macosx --show-sdk-version; echo "$GITHUB_SHA"; } | tee ci-results/environment.txt
           test "$(uname -m)" = arm64
       - name: Build native application
         shell: bash
         run: |
           set -euo pipefail
-          ./build.sh 2>&1 | tee build/validation/build.log
-          file build/ONEDESK | tee build/validation/binary.txt
+          ./build.sh 2>&1 | tee ci-results/build.log
+          file build/ONEDESK | tee ci-results/binary.txt
           lipo -verify_arch arm64 build/ONEDESK
           codesign --verify --deep --strict 'build/stage/ONE DESK.app'
           ditto -c -k --sequesterRsrc --keepParent 'build/stage/ONE DESK.app' build/ONE-DESK-app.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: ONE-DESK-build-intermediate
           path: build/ONE-DESK-app.zip
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: ONE-DESK-build-logs
-          path: build/validation/
+          path: ci-results/
   self-test:
     needs: build
     runs-on: macos-15
     timeout-minutes: 10
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: ONE-DESK-build-intermediate
       - name: Run application self-test
@@ -59,7 +62,7 @@ jobs:
           test "$(uname -m)" = arm64
           ditto -x -k ONE-DESK-app.zip .
           'ONE DESK.app/Contents/MacOS/ONEDESK' --selftest 2>&1 | tee self-test.log
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: ONE-DESK-self-test-results
@@ -68,7 +71,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - name: Run complete existing suite and Notch Eyes tests
@@ -77,7 +80,7 @@ jobs:
           set -euo pipefail
           test "$(uname -m)" = arm64
           ./build.sh --test 2>&1 | tee unit-tests.log
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: ONE-DESK-test-results
@@ -87,10 +90,10 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: ONE-DESK-build-intermediate
           path: build
@@ -105,12 +108,12 @@ jobs:
           cp build/ONE-DESK-app.zip dist/ONE-DESK-dev-macos-arm64.zip
           git archive --format=zip --output=dist/ONE-DESK-corresponding-source.zip HEAD
           shasum -a 256 dist/* > dist/SHA256SUMS
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: ONE-DESK-packages-intermediate
           path: dist/
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: ONE-DESK-packaging-log
@@ -119,11 +122,11 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: ONE-DESK-packages-intermediate
           path: dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: ONE-DESK-dev-macos-arm64
           path: |
@@ -131,7 +134,7 @@ jobs:
             dist/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: ONE-DESK-dev-DMG
           path: dist/*.dmg
