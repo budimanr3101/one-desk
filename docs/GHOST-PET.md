@@ -61,3 +61,12 @@ mapping and larger Companion tracks. Native compilation, these new tests, actual
 web-download behavior on macOS and visual/hardware appearance require the new CI
 run and subsequent real-Mac testing. The previous successful foundation CI does
 not validate this new Ghost implementation.
+
+## Round and Slim parity
+
+The same Companion behavior settings and interactive stage now apply to Round
+and Slim eyes. They need no downloaded asset. NotchEyesRig draws a native pair
+inside the existing Companion motion hierarchy, with bounded pupil gaze from
+local/global mouse events and the original eye size/sensitivity/blink/idle
+preferences. Ghost, Round and Slim share the pet behavior preferences; switching
+appearance preserves them. Classic Companion preferences remain separate.

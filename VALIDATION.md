@@ -190,3 +190,14 @@ deriving it from its enclosing surface height. Both the sprite preview and the
 interactive Companion stage receive the same slider size. Added regression cases
 cover 32/52/72-point characters inside an independently taller island. Static
 checks pass on Linux; macOS CI and physical confirmation remain pending for this fix.
+
+## Shared Companion behavior for all appearances
+
+Round and Slim now activate the same pet profile without requiring Ghost artwork.
+All three appearances expose the shared stage, side, hide-idle, visit frequency,
+reactions and Command Bar settings. Round/Slim render native white eye pairs in
+the existing moving Companion rig, using event-driven pupil tracking and a
+cancellable blink/idle schedule. Hidden/disabled views remove monitors and pending
+work. Tests cover activation, preference routing, size and classic restoration
+for each eye style and rejection of unknown appearances. Static validation passes;
+this change awaits native CI and physical-Mac appearance/behavior checks.

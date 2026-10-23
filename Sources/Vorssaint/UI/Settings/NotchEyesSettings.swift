@@ -44,14 +44,6 @@ struct NotchEyesSettings: View {
                         NotchGhostView().frame(width: petSize, height: petSize)
                             .frame(width: 96, height: 96)
                             .padding(12).background(.black, in: RoundedRectangle(cornerRadius: 14))
-                        NotchMascotStageCard(look: NotchMascotSupport.look(),
-                            side: NotchMascotSide(rawValue: side) ?? .left,
-                            awake: enabled, canGreet: enabled && NotchSupport.isEnabled(),
-                            visits: visits, reactions: reactions, hides: hides,
-                            text: FeatureStrings.notchMascot(l10n.language), language: l10n.language,
-                            petSize: CGFloat(petSize))
-                            .environment(\.notchGhostOverride, true)
-                        behavior
                         Text("Pet size"); Slider(value: $petSize, in: 32...72, step: 2)
                         Toggle("Animate pet actions", isOn: $petAnimations)
                     }
@@ -81,12 +73,25 @@ struct NotchEyesSettings: View {
                     Toggle("Natural blinking", isOn: $blink)
                     Toggle("Idle gaze", isOn: $idle)
                 }
-                Text("Select None for island idle content to show the resting pet. Ghost uses Companion visits, reactions and Command Bar, with its own settings. Selecting Ghost takes priority over the classic Companion. Crowded menus can limit its size.")
+                NotchMascotStageCard(look: NotchMascotSupport.look(),
+                    side: NotchMascotSide(rawValue: side) ?? .left,
+                    awake: enabled && (style != "ghost" || installed),
+                    canGreet: enabled && NotchSupport.isEnabled() && (style != "ghost" || installed),
+                    visits: visits, reactions: reactions, hides: hides,
+                    text: FeatureStrings.notchMascot(l10n.language), language: l10n.language,
+                    petSize: style == "ghost" ? CGFloat(petSize) : CGFloat(size * 2.8))
+                    .environment(\.notchGhostOverride, true)
+                behavior
+                Text("Select None for island idle content to show the resting pet. All appearances use Companion visits, reactions and Command Bar, with shared settings. Enabling Notch Eyes / Pet takes priority over the classic Companion. Crowded menus can limit its size.")
                     .font(.caption).foregroundStyle(.secondary)
             }.padding(8)
                 .onChange(of: enabled) { _, _ in sync() }
                 .onChange(of: style) { _, _ in sync() }
                 .onChange(of: behaviorRevision) { _, _ in sync() }
+                .onChange(of: size) { _, _ in sync() }
+                .onChange(of: sensitivity) { _, _ in sync() }
+                .onChange(of: blink) { _, _ in sync() }
+                .onChange(of: idle) { _, _ in sync() }
                 .onChange(of: petSize) { _, _ in sync() }
                 .onDisappear { downloadTask?.cancel(); downloadTask = nil }
         }

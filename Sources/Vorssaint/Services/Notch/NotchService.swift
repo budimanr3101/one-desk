@@ -472,10 +472,8 @@ final class NotchService: ObservableObject {
     /// Ghost is larger than the eye strip, but uses the same host and priority gate.
     func ghostSurface(on geometry: NotchGeometry) -> CGSize? {
         guard NotchPetProfile.isActive(), mascotShows(on: geometry), compactActivity == nil, notice == nil,
-              !expanded, !peeking, !suspended, !hiddenInFullscreen, !hiddenUntilHover,
-              NotchGhostAssets.isInstalled else { return nil }
-        let dimension = NotchGhostSupport.dimension(UserDefaults.standard.double(forKey: DefaultsKey.notchPetSize),
-                                                   sideRoom: geometry.compactSideRoom)
+              !expanded, !peeking, !suspended, !hiddenInFullscreen, !hiddenUntilHover else { return nil }
+        let dimension = NotchPetProfile.dimension(sideRoom: geometry.compactSideRoom)
         return NotchGhostSupport.surface(base: geometry.collapsed, cameraWidth: geometry.cameraWidth,
                                          screenWidth: geometry.screen.width, dimension: dimension)
     }
@@ -4806,8 +4804,7 @@ extension NotchService {
         let width = surface?.width ?? geometry.collapsed.width
         let height = surface?.height ?? geometry.stripHeight
         let size = surface.map { _ in
-            NotchGhostSupport.dimension(UserDefaults.standard.double(forKey: DefaultsKey.notchPetSize),
-                                        sideRoom: geometry.compactSideRoom)
+            NotchPetProfile.dimension(sideRoom: geometry.compactSideRoom)
         }
         return NotchMascotSupport.track(stripWidth: width, stripHeight: height,
             wing: surface == nil ? geometry.restingWingWidth : max(0, (width - geometry.cameraWidth) / 2),

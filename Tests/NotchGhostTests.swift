@@ -44,6 +44,26 @@ enum NotchGhostTests {
         defaults.set(true, forKey: AppFeature.notchEyes.availabilityKey)
         defaults.set("", forKey: DefaultsKey.notchPetAssetRevision)
         suite.expect(!NotchPetProfile.isActive(in: defaults), "an undownloaded Ghost never replaces Companion")
+        for style in ["round", "slim"] {
+            defaults.set(style, forKey: DefaultsKey.notchEyesStyle)
+            defaults.set(14.0, forKey: DefaultsKey.notchEyesSize)
+            defaults.set(true, forKey: DefaultsKey.notchPetCommandBar)
+            suite.expect(NotchPetProfile.isActive(in: defaults), "both eye styles activate without downloading artwork")
+            suite.expect(NotchMascotSupport.side(in: defaults) == .right
+                && NotchMascotSupport.visits(in: defaults) && NotchMascotSupport.reacts(in: defaults)
+                && NotchMascotSupport.hidesWhenIdle(in: defaults)
+                && NotchMascotSupport.commandBarStyle(in: defaults) == .island,
+                "every eye appearance participates in Companion behavior and Command Bar")
+            suite.expect(abs(NotchPetProfile.dimension(in: defaults) - 39.2) < 0.001,
+                         "eye size determines the shared character track")
+            defaults.set(false, forKey: DefaultsKey.notchEyesEnabled)
+            suite.expect(!NotchPetProfile.isActive(in: defaults)
+                && NotchMascotSupport.side(in: defaults) == .left,
+                "disabling either eye appearance restores classic Companion")
+            defaults.set(true, forKey: DefaultsKey.notchEyesEnabled)
+        }
+        defaults.set("unrecognized", forKey: DefaultsKey.notchEyesStyle)
+        suite.expect(!NotchPetProfile.isActive(in: defaults), "unknown appearances do not take over Companion")
         for reaction in NotchMascotReaction.allCases {
             suite.expect(NotchPetProfile.action(for: reaction).frameCount > 0, "every Companion reaction has a Ghost animation")
         }

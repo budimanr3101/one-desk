@@ -32,6 +32,8 @@ enum NotchMascotCue: Equatable {
 final class NotchMascotRig: NSObject {
     let root = CALayer()
     private let ghost = NotchGhostRig()
+    private let petEyes = NotchEyesRig()
+    private var rendersEyes = false
     private var rendersGhost = false
     var ghostOverride: Bool?
     private(set) var look = NotchMascotLook.standard
@@ -77,6 +79,7 @@ final class NotchMascotRig: NSObject {
         squasher.addSublayer(tilter)
         for layer in [ears, antenna, bulb, fill, visor, shine] { tilter.addSublayer(layer) }
         tilter.addSublayer(ghost.root)
+        tilter.addSublayer(petEyes.root)
         tilter.addSublayer(attention)
         attention.addSublayer(face)
         face.addSublayer(leftEye)
@@ -102,8 +105,12 @@ final class NotchMascotRig: NSObject {
     /// Draws the companion at `size` points with `look`. Nothing moves, and a
     /// new look at the same size cross-fades in, as a choice in Settings does.
     func configure(look: NotchMascotLook, size: CGFloat, contentsScale scale: CGFloat) {
-        let useGhost = ghostOverride ?? NotchPetProfile.isActive()
-        let skinChanged = rendersGhost != useGhost
+        let usePet = ghostOverride ?? NotchPetProfile.isActive()
+        let useGhost = usePet && UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) == "ghost"
+        let useEyes = usePet && !useGhost
+        let skinChanged = rendersGhost != useGhost || rendersEyes != useEyes
+        rendersEyes = useEyes
+        petEyes.configure(active: useEyes, size: size, scale: scale, reduceMotion: reduceMotion)
         rendersGhost = useGhost
         ghost.configure(active: useGhost, size: size, scale: scale, reduceMotion: reduceMotion)
         guard !configured || skinChanged || look != self.look || size != self.size || scale != root.contentsScale else { return }
@@ -114,7 +121,7 @@ final class NotchMascotRig: NSObject {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         defer {
-            if rendersGhost {
+            if rendersGhost || rendersEyes {
                 for layer in [ears, antenna, bulb, fill, visor, shine, attention, face] { layer.isHidden = true }
             } else { fill.isHidden = false; attention.isHidden = false; face.isHidden = false }
             CATransaction.commit()
@@ -511,6 +518,7 @@ final class NotchMascotRig: NSObject {
     /// Reduce Motion it only changes face.
     func react(_ reaction: NotchMascotReaction, lift: CGFloat) {
         if rendersGhost { ghost.play(NotchPetProfile.action(for: reaction)) }
+        if rendersEyes { petEyes.react() }
         guard size > 0 else { return }
         // Whatever it is, it wakes up for it.
         if dozed, reaction != .wakeUp { setMood(.idle, animated: !reduceMotion) }
@@ -754,7 +762,8 @@ final class NotchMascotRig: NSObject {
     /// Blinks wait while the layer is out of sight, and `visible` resumes them.
     func setIdles(_ idles: Bool, visible: Bool) {
         ghost.setVisible(visible)
-        let wanted = idles && visible && !rendersGhost
+        petEyes.setVisible(visible)
+        let wanted = idles && visible && !rendersGhost && !rendersEyes
         guard wanted != self.idles else { return }
         self.idles = wanted
         if !wanted {

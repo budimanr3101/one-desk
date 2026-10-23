@@ -671,7 +671,8 @@ struct NotchRestingStrip: View {
     private var ghostSurface: CGSize? {
         // Asset revision invalidates the view after an explicit download/import.
         _ = petRevision
-        return eyeStyle == "ghost" ? service.ghostSurface(on: geometry) : nil
+        _ = petSize
+        return service.ghostSurface(on: geometry)
     }
     private var ghostDimension: CGFloat {
         NotchGhostSupport.dimension(petSize, sideRoom: geometry.compactSideRoom)
