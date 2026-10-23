@@ -1,18 +1,18 @@
 # ONE DESK validation
 
-Status: **source implementation delivered; macOS development build blocked**.
+Status: **native compilation succeeded; full CI and packaging still pending**.
 Do not interpret source parsing or upstream CI as proof that ONE DESK compiles,
 passes unit tests, renders smoothly, or works on physical hardware.
 
 ## Environment
 
-- Date: 2026-10-22 (UTC).
+- Updated: 2026-10-23 (Asia/Jakarta).
 - Workspace: `/workspace/onedesk`, Codex Cloud Linux 6.18.55, x86_64.
-- Swift compiler version: unavailable (`swiftc` is not installed).
+- Linux Swift compiler: unavailable. Native CI: Apple Swift 6.0.3, Xcode 16.2, SDK 15.2.
 - macOS SDK / Xcode / AppKit: unavailable; baseline `./build.sh` exits at
   `xcrun: command not found` (status 127).
 - Shell: zsh for the upstream build scripts; Python 3.12 for test generation.
-- Destination: not configured. Upstream is read-only remote `upstream`.
+- Destination: https://github.com/budimanr3101/one-desk; branch pushed. Upstream push URL is disabled.
 - Branch: `feat/onedesk-foundation`. Git history retains the upstream ancestor.
 
 ## Baseline established before implementation
@@ -35,7 +35,7 @@ independently measured. A small API result snapshot is saved under
 
 | Validation | Result |
 | --- | --- |
-| Source changes and branch | Implemented locally |
+| Source changes and branch | Committed and pushed to the independent fork |
 | Git diff whitespace/errors (`git diff --check`) | Passed |
 | zsh syntax: build, packaging, signing, uninstall, install test | Passed |
 | `python3 Tests/generate_sources.py` | Passed |
@@ -45,11 +45,11 @@ independently measured. A small API result snapshot is saved under
 | Swift static parser | No new parser errors across 208 changed/new Swift files; six files have parser limitations also present upstream |
 | `Tests/PreferenceCleanupTests.sh` | Passed (`PREFERENCE CLEANUP TESTS OK`) |
 | `Tests/UninstallSpacesTests.sh` | Attempted; failed because macOS `plutil`/preference tooling is absent in Linux. Not disabled or represented as passing |
-| macOS compilation | Not run: no macOS SDK and no writable destination |
+| macOS compilation | Passed in runs 39882559587 and 39883509163; ARM64 app bundle assembled and ad-hoc signed |
 | App self-test | Not run for ONE DESK |
-| Swift unit tests | Implemented/extended, not executed; compiler unavailable |
-| CI integration tests | Not run for ONE DESK |
-| `.app`, ZIP, DMG packaging and signing | Workflow prepared, not executed |
+| Swift unit tests | Executed: latest completed run had 1 failure out of 113,340 checks; correction pushed for rerun |
+| CI integration tests | Executed, not yet passing overall |
+| `.app`, ZIP, DMG packaging and signing | App assembly/signing passed; ZIP/DMG pipeline gated by remaining checks |
 | Downloadable compiled artifact links | None; no successful ONE DESK CI run |
 | Physical Mac / visual / camera / notch testing | Not performed |
 
@@ -79,31 +79,44 @@ Retina output and blink appearance still require macOS execution and/or visual
 inspection. The pure lifecycle test exercises the production subscription owner;
 it does not prove every OS/session visibility callback tears down the host.
 
-## GitHub blocker and resumption
+## Native CI history
 
-`gh auth status` identifies `budimanr3101`. Creating a fork with
-`gh repo fork vorssaint/vorssaint-utils --clone=false --remote=false` returned:
+The initial attempt to create a fork was rejected with HTTP 403. The user then
+provided https://github.com/budimanr3101/one-desk, and pushes now succeed. No source
+was pushed upstream.
 
-> HTTP 403: Resource not accessible by integration
+- [First run](https://github.com/budimanr3101/one-desk/actions/runs/39882559587):
+  macOS 15.7.9 ARM64, Xcode 16.4, Swift 6.1.2, SDK 15.5. App compilation and bundle
+  signing passed. Workflow failed because build cleanup removed its log directory;
+  tests reported 22 failures among 113,338 checks. Diagnostics are retained in
+  `docs/validation/first-native-run.txt`.
+- [Corrective run](https://github.com/budimanr3101/one-desk/actions/runs/39883509163):
+  pinned Xcode 16.2 / Swift 6.0.3 / SDK 15.2. Native app assembly passed again.
+  Tests reported 1 failure among 113,340 checks. The assertion failed to account
+  for an earlier application-activation menu-space read. Build validation failed
+  because `lipo -verify_arch` consumed the executable path as an architecture.
+- Next corrections use a relative read-count assertion and place the lipo input
+  before `-verify_arch`. They have passed static checks; native confirmation is
+  pending. The user requested that CI be left running and will report results.
 
-No source was pushed to the official repository. No repository outside this
-checkout was modified. A user-created fork or repository access grant is required;
-see [cloud build instructions](docs/CLOUD-BUILDS.md). Once connected, push this
-branch and inspect the actual workflow logs. Populate this document with the
-ONE DESK run URL, measured runner architecture, Swift/Xcode/SDK versions, build,
-self-test, unit-test, packaging results and artifact URLs. Fix any failures before
-calling the build usable.
+The current compiler reports NSImage Sendable warnings in existing thumbnail
+paths; these are not compilation errors in the current Swift language mode.
+They remain a forward-compatibility issue for Swift 6 language mode. No warning
+or signature check has been suppressed to force CI success.
+
+See [cloud build instructions](docs/CLOUD-BUILDS.md). Record the eventual successful
+run and artifact URLs here after native tests and packaging actually complete.
 
 ## Known limitations
 
-- Native source is uncompiled; compiler and runtime issues may remain.
+- Native compilation passed, but full validation and real-Mac runtime checks remain incomplete.
 - New eye-settings labels are English in all existing locales.
 - Eyes deliberately require idle content None, adequate wing space, and Companion
   disabled. They do not expand into scarce menu-bar space or draw in the cutout.
 - Verify hidden-window teardown during lock/Space/Mission Control changes; the
   upstream host can retain an attached hidden view. Hidden cursor events are
   ignored, but real-Mac profiling must establish the idle resource cost.
-- App self-update is disabled. Repository metadata is unconfigured. Original
+- App self-update is disabled. Repository metadata points to the independent fork. Original
   author support/donation destinations remain upstream links.
 - Upload/feedback endpoints are `.invalid` until independent hosting exists;
   local screenshot, recording and file export remain available.

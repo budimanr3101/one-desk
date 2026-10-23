@@ -9,17 +9,20 @@ git remote rename origin upstream
 git switch -c feat/onedesk-foundation
 ```
 
-Upstream history is preserved. The current GitHub integration can read upstream
-Actions, but `gh repo fork ... --clone=false --remote=false` returned
-`403 Resource not accessible by integration`. No push to upstream was attempted.
-
-Create a fork through GitHub under your own account (or grant this integration
-access to an existing fork). Then, using that actual URL:
+Upstream history is preserved. The initial integration could not create a fork
+(HTTP 403). On 2026-10-23 the user supplied the independent fork
+`https://github.com/budimanr3101/one-desk`; this checkout now uses it as `origin`.
+The feature branch has been pushed successfully. The upstream push URL is
+`DISABLED` to prevent accidental publication there.
 
 ```sh
-git remote add origin https://github.com/YOUR_ACCOUNT/YOUR_FORK.git
+git remote add origin https://github.com/budimanr3101/one-desk.git
 git push -u origin feat/onedesk-foundation
 ```
+
+The first ONE DESK Actions run is
+https://github.com/budimanr3101/one-desk/actions/runs/39882559587.
+See VALIDATION.md for the final native results and subsequent corrective runs.
 
 Never set the writable origin to `vorssaint/vorssaint-utils`. The archived upstream
 release workflow is not executable. Enable Actions in the fork if GitHub asks;

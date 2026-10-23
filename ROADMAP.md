@@ -2,8 +2,8 @@
 
 ## Finish the development build
 
-Connect an authorized GitHub fork, push the feature branch, enable Actions and
-inspect every native build/test/package result. Resolve compiler/runtime failures
+The independent fork is connected and the feature branch is pushed. Finish
+corrective CI and inspect every native build/test/package result. Resolve compiler/runtime failures
 before describing the app as built. Complete the physical-Mac checklist in
 VALIDATION.md. Translate the new settings labels, profile idle work, configure
 repository metadata and independent support links, then choose a final bundle ID.

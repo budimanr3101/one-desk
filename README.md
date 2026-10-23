@@ -11,12 +11,15 @@ Animation; no web shell or additional runtime dependencies.
 
 ## Development status
 
-Actual source changes and macOS CI configuration are provided. **ONE DESK has not
-yet been compiled or run on macOS.** The cloud workspace is Linux, and GitHub
-rejected creation of the destination fork with HTTP 403. No ONE DESK app/DMG
-artifact exists yet. See [VALIDATION.md](VALIDATION.md) for precise results and
-[cloud build instructions](docs/CLOUD-BUILDS.md) for completing delivery without a
-physical Mac.
+The feature branch is published in
+[budimanr3101/one-desk](https://github.com/budimanr3101/one-desk/tree/feat/onedesk-foundation).
+Native macOS compilation and app-bundle assembly have succeeded. The validation
+pipeline is being corrected: the latest completed run had one failing test
+assertion and an architecture-check command error. No fully validated app/DMG
+package has been uploaded yet.
+See [VALIDATION.md](VALIDATION.md) for measured results and
+[cloud build instructions](docs/CLOUD-BUILDS.md) for the workflow. Real-Mac visual
+and hardware verification remains pending.
 
 ## Notch Eyes
 
@@ -77,8 +80,7 @@ Self-updates and upstream release media are disabled for this development phase.
 Cloud screenshot/recording upload and feedback use a reserved `.invalid` endpoint
 until independent hosting is configured; local capture/export remains intact.
 Existing support/donation links refer to the **upstream authors**, not ONE DESK.
-Set `OneDeskRepositoryURL` in bundle metadata once the fork is known; until then
-in-app repository/website navigation opens GitHub's home page.
+`OneDeskRepositoryURL` is configured to the independent fork.
 
 ## Documentation and license
 

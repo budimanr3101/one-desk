@@ -30,6 +30,10 @@ fullscreen/Spaces/Mission Control behavior remain with the upstream implementati
 `NotchView.swift` only adds a decorative native view to the existing resting strip.
 `NotchService.swift` adds an eligibility predicate and includes eyes when asking
 existing geometry for resting wing space on the primary and mirrored displays.
+When menu coverage is disabled, eyes request space through the existing menu-space
+reader; disabling the feature releases that demand. No separate cursor polling is
+added.
+
 No timing curves, animation cleanup, window host, gesture handling, display-link
 or native masking implementation is replaced. Relevant layout regression hosts
 and assertions were extended for the new resting-content case. CI must still

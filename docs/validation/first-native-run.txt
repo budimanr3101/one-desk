@@ -1,0 +1,30 @@
+2026-10-23T01:11:27.8327920Z ProductVersion:		15.7.9
+2026-10-23T01:11:28.2703440Z Xcode 16.4
+2026-10-23T01:11:32.0495320Z Apple Swift version 6.1.2 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)
+2026-10-23T01:11:32.0501700Z Target: arm64-apple-macosx15.0
+2026-10-23T01:17:50.6949120Z ✓ Bundle ready: build/stage/ONE DESK.app
+2026-10-23T01:17:50.7357320Z tee: build/validation/binary.txt: No such file or directory
+2026-10-23T01:18:02.5398060Z TESTS FAILED (22 of 113338):
+2026-10-23T01:18:02.5398940Z   - Tests/UpdateFeatureTests.swift:1312: in-app update notes remove the GitHub installation footer
+2026-10-23T01:18:02.5405370Z   - Tests/NotchMusicVisibilityTests.swift:225: eyes reserve resting wings through the existing surface layout
+2026-10-23T01:18:02.5406390Z   - Tests/NotchTests.swift:3483: the signed hardened app declares both the calendar capability and its permission explanation
+2026-10-23T01:18:02.5409900Z   - Tests/SwitcherModelFeatureTests.swift:206: the former combined scroll switch keeps both directions on after updating
+2026-10-23T01:18:02.5411310Z   - Tests/SwitcherModelFeatureTests.swift:272: a setup that never used direct-to-editor keeps asking after capture
+2026-10-23T01:18:02.5413030Z   - Tests/SwitcherModelFeatureTests.swift:290: a setup that kept the windowless desktop app is left exactly as it was
+2026-10-23T01:18:02.5415300Z   - Tests/SwitcherModelFeatureTests.swift:320: a setup that never customized the controls keeps the registered default
+2026-10-23T01:18:02.5416210Z   - Tests/SwitcherModelFeatureTests.swift:1756: moving battery temperature preserves a hidden temperature section
+2026-10-23T01:18:02.5417940Z   - Tests/SwitcherModelFeatureTests.swift:1760: subsequent System visibility changes cannot overwrite the Power choice
+2026-10-23T01:18:02.5421620Z   - Tests/SwitcherModelFeatureTests.swift:3220: an update keeps peripheral batteries in Power for menu bar users
+2026-10-23T01:18:02.5424000Z   - Tests/SwitcherModelFeatureTests.swift:3224: hiding the menu bar item later leaves the Power choice alone
+2026-10-23T01:18:02.5430120Z   - Tests/SwitcherModelFeatureTests.swift:3891: an upgrade keeps the switcher at the preview size it shared with Dock Preview, once
+2026-10-23T01:18:02.5432750Z   - Tests/SwitcherModelFeatureTests.swift:3910: an upgrade keeps the switcher paused in the apps it shared with Dock Preview, once
+2026-10-23T01:18:02.5435150Z   - Tests/FeatureCatalogTests.swift:670: the scroll direction a launch migration saved still counts as never switched on
+2026-10-23T01:18:02.5437910Z   - Tests/FeatureCatalogTests.swift:1295: an old fan opt-out does not install the feature
+2026-10-23T01:18:02.5442700Z   - Tests/AppUpdateRulesTests.swift:169: ONE DESK's own bundles never become exclusions
+2026-10-23T01:18:02.5447430Z   - Tests/AppUpdateRulesTests.swift:171: a picked identifier with whitespace that a reload would drop adds no rule
+2026-10-23T01:18:02.5448850Z   - Tests/AppUpdateRulesTests.swift:173: a picked identifier with a slash that a reload would drop adds no rule
+2026-10-23T01:18:02.5450210Z   - Tests/AppUpdateRulesTests.swift:175: a picked app without a usable name adds no rule a reload would drop
+2026-10-23T01:18:02.5450880Z   - Tests/AppUpdateRulesTests.swift:177: a picked path without a bundle adds no rule
+2026-10-23T01:18:02.5451500Z   - Tests/AppUpdateRulesTests.swift:181: picking an app cannot race an active scan
+2026-10-23T01:18:02.5452220Z   - Tests/AppUpdateRulesTests.swift:184: the same pick is saved once the scan is over
+
