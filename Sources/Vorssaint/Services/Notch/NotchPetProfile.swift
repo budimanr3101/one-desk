@@ -21,6 +21,10 @@ enum NotchPetProfile {
         return NotchGhostSupport.dimension(requested, sideRoom: sideRoom)
     }
 
+    static func eyeSeparation(cameraWidth: CGFloat, stripWidth: CGFloat) -> CGFloat {
+        let camera = max(0, min(cameraWidth, stripWidth))
+        return camera / 2 + max(0, stripWidth - camera) / 4
+    }
     static func key(_ pet: String, _ classic: String, in defaults: UserDefaults) -> String {
         isActive(in: defaults) ? pet : classic
     }

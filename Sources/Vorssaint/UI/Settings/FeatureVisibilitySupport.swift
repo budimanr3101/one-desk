@@ -372,6 +372,7 @@ extension AppFeature {
         case .notchEyes: return FeatureSettingsDestination(.notch)
         case .notchMascot: return FeatureSettingsDestination(.notchMascot)
         case .radialMenu: return FeatureSettingsDestination(.radialMenu)
+        case .liveTranslate: return FeatureSettingsDestination(.quickTools)
         case .scratchpad:
             return FeatureSettingsDestination(.quickTools, sectionAnchor: .scratchpad)
         case .commandBar: return FeatureSettingsDestination(.commandBar)
@@ -412,7 +413,7 @@ enum FeatureVisibilitySupport {
         case .shelf: return [.shelf]
         case .media: return [.mediaTools]
         case .quickTools: return [.quickLauncher, .quickToggles, .micMute,
-                                  .cameraPreview, .wallpaper, .scratchpad, .cleaningMode]
+                                  .cameraPreview, .wallpaper, .scratchpad, .cleaningMode, .liveTranslate]
         case .urlCleaner: return [.urlCleaner]
         case .cleaner: return [.cleaner]
         case .homebrew: return [.homebrew]

@@ -36,6 +36,7 @@ final class NotchMascotRig: NSObject {
     private var rendersEyes = false
     private var rendersGhost = false
     var ghostOverride: Bool?
+    var eyeSeparation: CGFloat = 0
     private(set) var look = NotchMascotLook.standard
     private(set) var size: CGFloat = 0
     private(set) var mood = NotchMascotMood.idle
@@ -110,7 +111,7 @@ final class NotchMascotRig: NSObject {
         let useEyes = usePet && !useGhost
         let skinChanged = rendersGhost != useGhost || rendersEyes != useEyes
         rendersEyes = useEyes
-        petEyes.configure(active: useEyes, size: size, scale: scale, reduceMotion: reduceMotion)
+        petEyes.configure(active: useEyes, size: size, scale: scale, reduceMotion: reduceMotion, separation: eyeSeparation)
         rendersGhost = useGhost
         ghost.configure(active: useGhost, size: size, scale: scale, reduceMotion: reduceMotion)
         guard !configured || skinChanged || look != self.look || size != self.size || scale != root.contentsScale else { return }
@@ -1100,8 +1101,9 @@ final class NotchMascotHostView: NSView {
     }
 
     func configure(look: NotchMascotLook, size: CGFloat, mood: NotchMascotMood, idles: Bool,
-                   reduceMotion: Bool, animated: Bool, ghostOverride: Bool? = nil) {
+                   reduceMotion: Bool, animated: Bool, ghostOverride: Bool? = nil, eyeSeparation: CGFloat = 0) {
         mascot.ghostOverride = ghostOverride
+        mascot.eyeSeparation = eyeSeparation
         mascot.reduceMotion = reduceMotion
         let shift = figureShift
         mascot.configure(look: look, size: size, contentsScale: backingScale)
@@ -1278,7 +1280,9 @@ struct NotchMascotTrackView: NSViewRepresentable {
     func updateNSView(_ view: NotchMascotHostView, context: Context) {
         view.configure(look: look, size: track.size, mood: awake ? mood : .sleepy, idles: rests && awake,
                        reduceMotion: context.environment.accessibilityReduceMotion, animated: true,
-                       ghostOverride: context.environment.notchGhostOverride)
+                       ghostOverride: context.environment.notchGhostOverride,
+                       eyeSeparation: (context.environment.notchGhostOverride ?? NotchPetProfile.isActive()) && UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) != "ghost"
+                           ? track.hidden.map { NotchPetProfile.eyeSeparation(cameraWidth: $0.upperBound - $0.lowerBound, stripWidth: track.width) } ?? 0 : 0)
         // Off stage at the far end once a visit is over, so nothing jumps
         // when its last frame hands back to where it stands.
         let x = rests ? track.rest : track.mirrored ? -track.size * 2 : track.width + track.size * 2

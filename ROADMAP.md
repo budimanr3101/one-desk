@@ -11,22 +11,15 @@ Design an independent Developer ID/notarization process separately; no public
 release is enabled in this phase. Privileged helper trust and remote upload/feedback
 hosting must be configured independently before those functions are advertised.
 
-## Live Translate (not implemented)
+## Live Translate (development MVP implemented; validation pending)
 
-Add catalog entries and registered preference keys through `FeatureCatalog`,
-`FeatureRuntime` and `Defaults`, with an individual Settings destination. Reuse
-permissions reporting for microphone and audio capture; ask contextually before
-starting. Reuse recorder/system-audio capture abstractions rather than introducing
-a second permanent audio tap. Investigate Apple's Translation framework version
-availability (macOS 14 is the floor), and make offline/download/provider behavior
-explicit. English ↔ Indonesian support must be verified for the chosen engine.
-
-Use an on-demand service to coordinate audio, transcription, translation and bounded
-subtitle buffers. A global shortcut should reuse `HotkeyManager`/existing shortcut
-models; activities should use the existing island presentation and priority rules.
-Stop taps/tasks on disable, stop, lock/session changes and permission loss. Test
-cancellation, consent, buffering, unavailable engines and language direction.
-Do not retain audio or transcript data without a clear user action.
+The optional module now includes EN ↔ ID speech translation, microphone/system
+input, native subtitles, island notices and a global start/stop shortcut. See
+[usage, provider/privacy and limitations](docs/LIVE-TRANSLATE.md). Validate real
+Apple Speech language support, permissions, latency and audio session rotation.
+Future additions: offline/native translation when language/OS support permits,
+provider selection, per-app audio input, configurable shortcut, caption history
+and export behind explicit user action. No audio/transcripts are persisted now.
 
 ## Universal File Actions (not implemented)
 

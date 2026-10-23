@@ -105,3 +105,15 @@ Preserve source headers and copyright notices. Redistribution must include the
 corresponding source under GPL-3.0-or-later. The original contributor guide remains
 in [CONTRIBUTING.md](CONTRIBUTING.md); its upstream commands and release guidance
 are historical context, superseded for this fork by the cloud build instructions.
+
+### Live Translate (development MVP)
+
+Install **Live Translate** from Features, then open **Quick Tools → Live Translate**.
+Choose English ↔ Indonesian and microphone/system audio, accept the provider
+disclosure, then Start. Includes floating subtitles, optional island notices and
+Control–Option–Shift–T start/stop. Uses Apple Speech and online MyMemory translation;
+Internet, provider quotas and host speech-language availability apply. No audio or
+transcript files are saved. See [setup and limitations](docs/LIVE-TRANSLATE.md).
+
+Round/Slim resting eyes straddle the physical camera again (one per side), while
+retaining shared Companion visits, reactions and Command Bar controls.

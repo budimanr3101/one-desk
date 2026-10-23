@@ -25,16 +25,16 @@ final class NotchEyesRig {
             eyes[i].addSublayer(pupils[i]); root.addSublayer(eyes[i])
         }
     }
-    func configure(active: Bool, size: CGFloat, scale: CGFloat, reduceMotion: Bool) {
+    func configure(active: Bool, size: CGFloat, scale: CGFloat, reduceMotion: Bool, separation: CGFloat) {
         self.active = active; self.reduceMotion = reduceMotion
         slim = UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) == "slim"
         CATransaction.begin(); CATransaction.setDisableActions(true)
         root.isHidden = !active
         root.frame = CGRect(x: 0, y: 0, width: size, height: size)
-        let diameter = size / 2.8
+        let diameter = CGFloat(NotchEyesSupport.eyeSize(UserDefaults.standard.double(forKey: DefaultsKey.notchEyesSize)))
         for i in eyes.indices {
             eyes[i].bounds = CGRect(x: 0, y: 0, width: diameter, height: diameter)
-            eyes[i].position = CGPoint(x: size / 2 + (i == 0 ? -1 : 1) * diameter * 0.65, y: size / 2)
+            eyes[i].position = CGPoint(x: size / 2 + (i == 0 ? -1 : 1) * (separation > 0 ? separation : diameter * 0.65), y: size / 2)
             let height = slim ? diameter * 0.6 : diameter
             eyes[i].path = CGPath(ellipseIn: CGRect(x: 0, y: (diameter - height) / 2,
                                                    width: diameter, height: height), transform: nil)

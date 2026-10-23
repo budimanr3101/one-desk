@@ -5,6 +5,10 @@ import Foundation
 enum NotchEyesTests {
     static func run(_ suite: TestSuite) {
         NotchGhostTests.run(suite)
+        LiveTranslateTests.run(suite)
+        let separation = NotchPetProfile.eyeSeparation(cameraWidth: 180, stripWidth: 268)
+        suite.expect(134 - separation < 44 && 134 + separation > 224,
+                     "resting eye centers sit in opposite camera wings")
         var installations = 0, removals = 0
         var lifecycle: NotchEyesLifecycle? = NotchEyesLifecycle()
         let install: () -> (() -> Void) = { installations += 1; return { removals += 1 } }

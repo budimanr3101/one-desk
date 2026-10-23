@@ -342,6 +342,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
         // microphone priority selection remains the system input on quit.
         AudioInputDeviceManager.shared.stop()
         // Flushes any scratchpad edit still inside the save debounce.
+        if AppFeature.liveTranslate.isAvailable { LiveTranslateService.shared.suspend() }
         ScratchpadService.shared.suspend()
         // Every macOS shortcut a feature took over goes back now, whichever
         // feature held it; not all of them suspend here.

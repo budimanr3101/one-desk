@@ -28,7 +28,7 @@ enum AppFeature: String, CaseIterable {
     // Tools
     case quickLauncher, quickToggles, colorPicker, screenOCR, cleaningMode, mediaTools,
          cleaner, uninstaller, homebrew, appUpdates, screenshot, cameraPreview, radialMenu, scratchpad,
-         commandBar, screenRecorder, wallpaper, killProcess, portManager
+         commandBar, screenRecorder, wallpaper, killProcess, portManager, liveTranslate
     // Dynamic Island, then its extensions
     case notch, notchCalendar, notchNotifications, notchGestures, notchTimer, notchAccessories, notchLyrics,
          notchQueue, notchLiveEqualizer, notchDownloads, notchAgents, notchWatch, notchMascot, notchEyes
@@ -83,7 +83,7 @@ extension AppFeature {
         // Watch asks when an area is chosen and checks on every reading. The
         // companion uses no permission at all.
         case .screenOCR, .cleaningMode, .screenshot, .commandBar, .screenRecorder, .wallpaper, .notchWatch,
-             .notchMascot, .notchEyes:
+             .notchMascot, .notchEyes, .liveTranslate:
             return false
         default:
             return true
@@ -115,7 +115,7 @@ extension AppFeature {
             return .energyDisplay
         case .quickLauncher, .quickToggles, .colorPicker, .screenOCR, .cleaningMode, .mediaTools,
              .cleaner, .uninstaller, .homebrew, .appUpdates, .screenshot, .cameraPreview, .radialMenu,
-             .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager:
+             .scratchpad, .commandBar, .screenRecorder, .wallpaper, .killProcess, .portManager, .liveTranslate:
             return .tools
         case .notch, .notchCalendar, .notchNotifications, .notchGestures, .notchTimer, .notchAccessories,
              .notchLyrics, .notchQueue, .notchLiveEqualizer, .notchDownloads, .notchAgents, .notchWatch,
@@ -198,6 +198,7 @@ extension AppFeature {
         case .notchMascot: return "face.smiling"
         case .notch: return "macbook"
         case .radialMenu: return "circle.grid.cross"
+        case .liveTranslate: return "character.bubble"
         case .scratchpad: return "note.text"
         case .commandBar: return "command"
         case .killProcess: return "xmark.octagon"
@@ -269,6 +270,7 @@ extension AppFeature {
         case .notchCalendar: return [DefaultsKey.notchCalendarEnabled]
         case .notchAgents: return [DefaultsKey.notchAgentsEnabled]
         case .notchWatch: return [DefaultsKey.notchWatchEnabled]
+        case .liveTranslate: return [DefaultsKey.liveTranslateEnabled]
         case .notchEyes: return [DefaultsKey.notchEyesEnabled]
         case .notchMascot: return [DefaultsKey.notchMascotEnabled]
         case .notch: return [DefaultsKey.notchEnabled]
@@ -306,7 +308,7 @@ extension AppFeature {
         switch self {
         case .windowLayout: return [DefaultsKey.windowLayoutShortcutsEnabled]
         case .audioPriority: return enabledKeys
-        case .notchLiveEqualizer: return []
+        case .notchLiveEqualizer, .liveTranslate: return []
         default: return enabledKeys.first.map { [$0] } ?? []
         }
     }
@@ -331,6 +333,7 @@ extension AppFeature {
     /// monitor only notifies when an alert is on, and so on).
     var permissions: [AppPermission] {
         switch self {
+        case .liveTranslate: return [.microphone, .screenRecording, .audioCapture]
         case .notchGestures: return []
         case .notchTimer, .notchAccessories: return []
         case .notchLyrics, .notchQueue: return []
@@ -486,7 +489,7 @@ extension AppFeature {
              .connectedDevices:
             return true
         case .focusFollowsMouse, .scrollHorizontal, .linearScroll, .diskImageInstaller, .audioPriority,
-             .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .notchEyes, .spacesOrder:
+             .wallpaper, .killProcess, .portManager, .fanControl, .notchMascot, .notchEyes, .spacesOrder, .liveTranslate:
             return false
         }
     }

@@ -114,3 +114,16 @@ Bar and bridge motion remain the owners of behavior. Only optional sprite hooks
 and a size override were added to the native rig/track. Classic geometry defaults
 are unchanged. NotchWindowHost was not modified. Ghost takes presentation priority
 when installed and enabled; disabling it restores the classic settings.
+
+## Live Translate
+
+An optional tools feature binds LiveTranslateService through FeatureRuntime.
+Capture is explicitly started only after consent and contextual permissions.
+The service uses AVAudioEngine for microphone or ScreenCaptureKit for system
+audio, Apple Speech for transcription and a bounded/debounced MyMemory request
+for EN/ID translation. Session/request identities reject stale asynchronous work.
+Capture, scheduled recognition rotation, hotkey registration and subtitle windows
+are torn down on stop/disable/session exit. Subtitles are native click-through
+NSPanels; island notices reuse the existing host with lowest event priority.
+LiveTranslateSupport holds pure request/direction/bounding/response policy for
+offline deterministic tests. See docs/LIVE-TRANSLATE.md for data flow/limitations.

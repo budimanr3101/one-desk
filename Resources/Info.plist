@@ -59,11 +59,13 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>ONE DESK uses Automation to move files, send items to the Trash, open requested commands and control playback in your media apps.</string>
 	<key>NSAudioCaptureUsageDescription</key>
-	<string>ONE DESK uses each app's audio to adjust its volume in the mixer, to move Dynamic Island's music bars and to include the Mac's sound in the screen recordings you start. Nothing leaves your Mac.</string>
+	<string>ONE DESK uses system audio for the mixer, music bars, recordings, and Live Translate sessions you start. Live Translate uses Apple Speech and sends recognized text to MyMemory only after your consent.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>ONE DESK uses Bluetooth only to read the battery level of connected peripherals. Nothing leaves your Mac.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>ONE DESK transcribes the audio you explicitly start in Live Translate to produce live subtitles.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>ONE DESK records your microphone only when you turn it on for a screen recording. The audio stays on your Mac unless you choose to create a temporary link.</string>
+	<string>ONE DESK uses your microphone for recordings or Live Translate sessions you start. Live Translate uses Apple Speech (on device when supported) and sends recognized text to MyMemory after your consent.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Show your upcoming appointments in the notch. Calendar events stay on this Mac.</string>
 	<key>NSCameraUsageDescription</key>

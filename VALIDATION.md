@@ -201,3 +201,26 @@ cancellable blink/idle schedule. Hidden/disabled views remove monitors and pendi
 work. Tests cover activation, preference routing, size and classic restoration
 for each eye style and rejection of unknown appearances. Static validation passes;
 this change awaits native CI and physical-Mac appearance/behavior checks.
+
+## Split eyes restoration and Live Translate MVP
+
+Round/Slim rest one eye per camera wing; camera separation and a centered shared
+rig preserve the existing camera mask and Companion motion. Added regression
+geometry coverage. Live Translate adds deterministic API/language/Unicode/quota,
+feature, backup-consent and island-priority tests. No live audio/network test is
+run by CI. Linux validation: source parsing, generated tests, plist parsing, zsh
+syntax, actionlint, preference cleanup and diff checks pass. This revision has
+not yet compiled on macOS; CI results/artifacts remain pending.
+
+Physical checks: eye positions and movement on real notched/multiple displays;
+EN/ID Apple Speech availability; microphone versus system-only capture; denied
+permissions; actual provider translation/quota behavior; session rotation; Stop
+during permission/network/capture start; disable/uninstall/lock/sleep cleanup;
+shortcut conflicts; subtitles and island priority/fullscreen/Spaces behavior.
+
+A synthetic Linux provider smoke check returned HTTP/responseStatus 200 for both
+EN→ID and ID→EN. EN “Good morning” returned “Selamat pagi”; the reverse query
+“Selamat pagi” returned an incorrect crowd-sourced phrase. This verifies API
+reachability/schema only, **not translation accuracy**. MyMemory quality is a
+known limitation of the online MVP; evaluate a higher-quality/offline provider
+before relying on captions. No user audio or transcript was used in this check.

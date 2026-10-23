@@ -26,6 +26,12 @@ struct QuickToolsSettings: View {
 
     var body: some View {
         Form {
+            if AppFeature.liveTranslate.isAvailable {
+                Section("Live Translate") {
+                    LiveTranslateSettings()
+                    Button("Open Live Translate window") { LiveTranslateService.shared.show() }
+                }
+            }
             if AppFeature.quickLauncher.isAvailable {
                 Section {
                     Button {

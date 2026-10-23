@@ -130,6 +130,7 @@ enum ReleaseChangeAliases {
             "capture guides", "capture links", "capture modes", "capture shortcut", "capture shortcuts"]
         case .cameraPreview: return ["camera preview", "camera mirror"]
         case .radialMenu: return ["radial menu", "radial menus"]
+        case .liveTranslate: return ["live translate", "translation", "subtitles"]
         case .scratchpad: return ["scratchpad"]
         case .commandBar: return ["command bar", "calculator"]
         case .screenRecorder: return ["screen recording", "screen recordings", "recording", "recordings",

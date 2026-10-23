@@ -17,6 +17,14 @@ enum DefaultsKey {
     static let notchPetSize = "notchPetSize"
     static let notchPetAnimations = "notchPetAnimations"
     static let notchPetAssetRevision = "notchPetAssetRevision"
+    static let liveTranslateEnabled = "liveTranslateEnabled"
+    static let liveTranslateDirection = "liveTranslateDirection"
+    static let liveTranslateInput = "liveTranslateInput"
+    static let liveTranslateConsent = "liveTranslateConsent"
+    static let liveTranslateSubtitles = "liveTranslateSubtitles"
+    static let liveTranslateNotch = "liveTranslateNotch"
+    static let liveTranslateShortcutEnabled = "liveTranslateShortcutEnabled"
+    static let liveTranslateShortcut = "liveTranslateShortcut"
     static let notchEyesEnabled = "notchEyesEnabled"
     static let notchEyesStyle = "notchEyesStyle"
     static let notchEyesSize = "notchEyesSize"
@@ -1215,6 +1223,14 @@ enum Defaults {
         DefaultsKey.notchPetSize: 52.0,
         DefaultsKey.notchPetAnimations: true,
         DefaultsKey.notchPetAssetRevision: "",
+        DefaultsKey.liveTranslateEnabled: false,
+        DefaultsKey.liveTranslateDirection: "englishIndonesian",
+        DefaultsKey.liveTranslateInput: "microphone",
+        DefaultsKey.liveTranslateConsent: false,
+        DefaultsKey.liveTranslateSubtitles: true,
+        DefaultsKey.liveTranslateNotch: true,
+        DefaultsKey.liveTranslateShortcutEnabled: false,
+        DefaultsKey.liveTranslateShortcut: "control+option+shift:17",
         DefaultsKey.notchEyesEnabled: false,
         DefaultsKey.notchEyesStyle: "round",
         DefaultsKey.notchEyesSize: 14.0,

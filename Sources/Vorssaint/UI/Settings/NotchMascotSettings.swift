@@ -585,9 +585,13 @@ struct NotchMascotStageModel {
             strip = NotchGhostSupport.surface(base: geometry.collapsed,
                 cameraWidth: geometry.cameraWidth, screenWidth: geometry.screen.width, dimension: dimension)
             menuBarHeight = max(geometry.menuBarHeight, strip.height)
-            track = NotchMascotSupport.track(stripWidth: strip.width, stripHeight: strip.height,
+            var petTrack = NotchMascotSupport.track(stripWidth: strip.width, stripHeight: strip.height,
                 wing: max(0, (strip.width - geometry.cameraWidth) / 2), cameraWidth: geometry.cameraWidth,
                 floats: geometry.floats, bodyHeight: strip.height, side: side, sizeOverride: dimension)
+            if UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) != "ghost" {
+                petTrack.rest = strip.width / 2
+            }
+            track = petTrack
         } else if geometry.floats {
             let size = geometry.restingSize(showsContent: false)
             strip = size

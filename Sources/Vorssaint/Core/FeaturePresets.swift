@@ -124,6 +124,7 @@ extension AppFeature {
         case .notchWatch: return .idle
         // A blink every few seconds and a visit every few minutes, both
         // drawn by Core Animation, with one timer waiting for the next visit.
+        case .liveTranslate: return .idle
         case .notchEyes: return .mouse
         case .notchMascot: return .periodic
         case .notchAccessories: return .periodic

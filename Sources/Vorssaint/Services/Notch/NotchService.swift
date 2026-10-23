@@ -474,6 +474,7 @@ final class NotchService: ObservableObject {
         guard NotchPetProfile.isActive(), mascotShows(on: geometry), compactActivity == nil, notice == nil,
               !expanded, !peeking, !suspended, !hiddenInFullscreen, !hiddenUntilHover else { return nil }
         let dimension = NotchPetProfile.dimension(sideRoom: geometry.compactSideRoom)
+        if UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) != "ghost" { return geometry.collapsed }
         return NotchGhostSupport.surface(base: geometry.collapsed, cameraWidth: geometry.cameraWidth,
                                          screenWidth: geometry.screen.width, dimension: dimension)
     }
@@ -2305,6 +2306,10 @@ final class NotchService: ObservableObject {
             reactMascot(.celebrate, patience: 30)
         }
         return accepted
+    }
+
+    func dismissTranslationNotice() {
+        if notice?.event == .translation { dismissNotice() }
     }
 
     @discardableResult
@@ -4806,10 +4811,16 @@ extension NotchService {
         let size = surface.map { _ in
             NotchPetProfile.dimension(sideRoom: geometry.compactSideRoom)
         }
-        return NotchMascotSupport.track(stripWidth: width, stripHeight: height,
+        var track = NotchMascotSupport.track(stripWidth: width, stripHeight: height,
             wing: surface == nil ? geometry.restingWingWidth : max(0, (width - geometry.cameraWidth) / 2),
             cameraWidth: geometry.cameraWidth, floats: surface != nil && geometry.floats,
             bodyHeight: surface == nil ? geometry.stripBodyHeight : height, side: mascotSide, sizeOverride: size)
+        if surface != nil, UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) != "ghost" {
+            // The eye pair straddles the physical camera. Keep the original
+            // camera mask while visits/reactions move the existing rig.
+            track.rest = width / 2
+        }
+        return track
     }
     private var mascotClosedTrack: NotchMascotTrack { restingCharacterTrack(on: geometry) }
 
