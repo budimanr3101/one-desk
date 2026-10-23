@@ -34,6 +34,19 @@ enum NotchGhostAssets {
         try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: fileURL, options: .atomic)
     }
+    /// Runs on the generic async executor, keeping disk I/O and checksum/image
+    /// validation out of the Settings view and off the main UI thread.
+    static func importSprite(from url: URL) async throws {
+        try Task.checkCancellation()
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        let bytes = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+        guard bytes > 0, bytes <= 4_000_000 else { throw Failure.invalid }
+        let data = try Data(contentsOf: url)
+        try Task.checkCancellation()
+        try install(data)
+    }
+
     static func download() async throws {
         var request = URLRequest(url: source)
         request.timeoutInterval = 30

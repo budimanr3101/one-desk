@@ -38,7 +38,12 @@ geometry, native sprite animation and explicit download/import. Ghost source
 artwork is not bundled. New tests cover atlas bounds/frame counts, reserved
 geometry, preference backup and asset rejection. Static parser, test generation,
 zsh syntax, actionlint and diff checks pass; native compilation/tests for this
-update are pending the new Actions run. See [Ghost documentation](docs/GHOST-PET.md).
+update are pending the new Actions run. The first Ghost test run executed
+113,481 checks with one repository-contract failure: the Settings import callback
+read image bytes directly in UI code. Import I/O, security-scoped access, size
+checks and installation now run in the async asset service. The contract test is
+unchanged; the corrected source is submitted for native validation.
+See [Ghost documentation](docs/GHOST-PET.md).
 
 ## ONE DESK foundation results
 

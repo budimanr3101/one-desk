@@ -36,7 +36,7 @@ struct NotchEyesSettings: View {
                         Toggle("Animate pet actions", isOn: $petAnimations)
                     }
                     HStack {
-                        Button(downloading ? "Downloading…" : (installed ? "Download Ghost again" : "Download Ghost from Petdex")) {
+                        Button(downloading ? "Loading Ghost…" : (installed ? "Download Ghost again" : "Download Ghost from Petdex")) {
                             downloadTask?.cancel()
                             downloading = true; failure = nil
                             downloadTask = Task {
@@ -81,14 +81,17 @@ struct NotchEyesSettings: View {
         panel.message = "Choose the original spritesheet.webp from the Ghost Petdex package."
         panel.begin { response in
             guard response == .OK, let url = panel.url else { return }
-            let scoped = url.startAccessingSecurityScopedResource()
-            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-            do {
-                let bytes = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-                guard bytes <= 4_000_000 else { throw NotchGhostAssets.Failure.invalid }
-                try NotchGhostAssets.install(Data(contentsOf: url))
-                failure = nil; didInstall()
-            } catch { failure = error.localizedDescription }
+            downloadTask?.cancel()
+            downloading = true; failure = nil
+            downloadTask = Task {
+                defer { downloading = false }
+                do {
+                    try await NotchGhostAssets.importSprite(from: url)
+                    try Task.checkCancellation()
+                    didInstall()
+                } catch is CancellationError { }
+                  catch { failure = error.localizedDescription }
+            }
         }
     }
 }
