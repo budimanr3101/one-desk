@@ -13,10 +13,10 @@ Animation; no web shell or additional runtime dependencies.
 
 The feature branch is published in
 [budimanr3101/one-desk](https://github.com/budimanr3101/one-desk/tree/feat/onedesk-foundation).
-Native macOS compilation and app-bundle assembly have succeeded. The validation
-pipeline is being corrected: the latest completed run had one failing test
-assertion and an architecture-check command error. No fully validated app/DMG
-package has been uploaded yet.
+[Development CI passed](https://github.com/budimanr3101/one-desk/actions/runs/39884700825): native ARM64 build, self-test,
+113,340 test checks, packaging and artifact uploads all succeeded.
+Download the [development app ZIP](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12471958180) or [DMG](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12472525943).
+These builds are ad-hoc signed and are not notarized.
 See [VALIDATION.md](VALIDATION.md) for measured results and
 [cloud build instructions](docs/CLOUD-BUILDS.md) for the workflow. Real-Mac visual
 and hardware verification remains pending.

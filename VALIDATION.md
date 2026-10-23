@@ -1,6 +1,6 @@
 # ONE DESK validation
 
-Status: **native compilation succeeded; full CI and packaging still pending**.
+Status: **development CI passed; app ZIP and DMG uploaded; physical-Mac testing pending**.
 Do not interpret source parsing or upstream CI as proof that ONE DESK compiles,
 passes unit tests, renders smoothly, or works on physical hardware.
 
@@ -46,11 +46,11 @@ independently measured. A small API result snapshot is saved under
 | `Tests/PreferenceCleanupTests.sh` | Passed (`PREFERENCE CLEANUP TESTS OK`) |
 | `Tests/UninstallSpacesTests.sh` | Attempted; failed because macOS `plutil`/preference tooling is absent in Linux. Not disabled or represented as passing |
 | macOS compilation | Passed in runs 39882559587 and 39883509163; ARM64 app bundle assembled and ad-hoc signed |
-| App self-test | Not run for ONE DESK |
-| Swift unit tests | Executed: latest completed run had 1 failure out of 113,340 checks; correction pushed for rerun |
-| CI integration tests | Executed, not yet passing overall |
-| `.app`, ZIP, DMG packaging and signing | App assembly/signing passed; ZIP/DMG pipeline gated by remaining checks |
-| Downloadable compiled artifact links | None; no successful ONE DESK CI run |
+| App self-test | Passed: SELFTEST OK; AppleSMC and power metrics unavailable on hosted runner |
+| Swift unit tests | Passed: 113,340 checks; preference cleanup, uninstall Spaces and installation-isolation shell tests also passed |
+| CI integration tests | All five jobs succeeded in run 39884700825 |
+| `.app`, ZIP, DMG packaging and signing | Passed: native bundle, signature verification, ZIP/DMG and uploads |
+| Downloadable compiled artifact links | [App/source ZIP](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12471958180), [DMG](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12472525943) |
 | Physical Mac / visual / camera / notch testing | Not performed |
 
 Static Swift parsing used tree-sitter-swift, **not a Swift compiler/type checker**.
@@ -95,21 +95,25 @@ was pushed upstream.
   Tests reported 1 failure among 113,340 checks. The assertion failed to account
   for an earlier application-activation menu-space read. Build validation failed
   because `lipo -verify_arch` consumed the executable path as an architecture.
-- Next corrections use a relative read-count assertion and place the lipo input
-  before `-verify_arch`. They have passed static checks; native confirmation is
-  pending. The user requested that CI be left running and will report results.
+- [Successful development run](https://github.com/budimanr3101/one-desk/actions/runs/39884700825), tested source commit
+  `d14432bdea26cbd34cb9fe3f3cd6d4e4eceb065a`: build, unit-tests, self-test,
+  package and upload all concluded success. Swift reported `TESTS OK (113340 checks)`;
+  all three shell test groups passed. Self-test reported `SELFTEST OK` with
+  AppleSMC/power-metric warnings expected on this hosted virtual machine.
+  Artifacts: [ONE-DESK-dev-macos-arm64](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12471958180) and
+  [ONE-DESK-dev-DMG](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12472525943). Artifact retention is 30 days; download a copy for later
+  testing. This evidence applies to the tested source commit, not later changes.
 
 The current compiler reports NSImage Sendable warnings in existing thumbnail
 paths; these are not compilation errors in the current Swift language mode.
 They remain a forward-compatibility issue for Swift 6 language mode. No warning
 or signature check has been suppressed to force CI success.
 
-See [cloud build instructions](docs/CLOUD-BUILDS.md). Record the eventual successful
-run and artifact URLs here after native tests and packaging actually complete.
+See [cloud build instructions](docs/CLOUD-BUILDS.md). The successful run and artifact URLs above are the development delivery evidence.
 
 ## Known limitations
 
-- Native compilation passed, but full validation and real-Mac runtime checks remain incomplete.
+- Native compilation and automated validation passed; real-Mac runtime and visual checks remain incomplete.
 - New eye-settings labels are English in all existing locales.
 - Eyes deliberately require idle content None, adequate wing space, and Companion
   disabled. They do not expand into scarce menu-bar space or draw in the cutout.

@@ -2,9 +2,9 @@
 
 ## Finish the development build
 
-The independent fork is connected and the feature branch is pushed. Finish
-corrective CI and inspect every native build/test/package result. Resolve compiler/runtime failures
-before describing the app as built. Complete the physical-Mac checklist in
+The independent fork is connected; native build, self-test, tests and development
+packaging passed in run 39884700825. Download and preserve the development artifacts,
+then complete the physical-Mac checklist in
 VALIDATION.md. Translate the new settings labels, profile idle work, configure
 repository metadata and independent support links, then choose a final bundle ID.
 Design an independent Developer ID/notarization process separately; no public
