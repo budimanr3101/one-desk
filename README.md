@@ -13,7 +13,7 @@ Animation; no web shell or additional runtime dependencies.
 
 The feature branch is published in
 [budimanr3101/one-desk](https://github.com/budimanr3101/one-desk/tree/feat/onedesk-foundation).
-[Development CI passed](https://github.com/budimanr3101/one-desk/actions/runs/39884700825): native ARM64 build, self-test,
+[Foundation development CI passed](https://github.com/budimanr3101/one-desk/actions/runs/39884700825): native ARM64 build, self-test,
 113,340 test checks, packaging and artifact uploads all succeeded.
 Download the [development app ZIP](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12471958180) or [DMG](https://github.com/budimanr3101/one-desk/actions/runs/39884700825/artifacts/12472525943).
 These builds are ad-hoc signed and are not notarized.
@@ -37,6 +37,17 @@ Eyes yield to activities, notifications, Companion, drag/drop, capture controls,
 expanded/peek interactions, and hidden/fullscreen states. Companion remains an
 independent feature. New settings currently use English labels in all locales;
 existing translated utilities and rebranded permission prompts remain available.
+
+## Ghost pet appearance
+
+The new Ghost update is submitted for macOS CI; the successful foundation build
+above predates it. In the Notch Eyes settings choose **Ghost · Petdex**, then
+**Download Ghost from Petdex**. Ghost appears as a larger animated pet (default
+52 points) with idle, wave, jump, walk and expression actions; no cursor tracking.
+A preview, size slider and animation toggle are provided. It yields to existing
+island content and Companion. See [Ghost setup and asset provenance](docs/GHOST-PET.md).
+The image is fetched only on request and is not bundled with ONE DESK because
+its package does not declare redistribution rights.
 
 ## Cloud builds
 

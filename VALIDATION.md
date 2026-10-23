@@ -1,6 +1,6 @@
 # ONE DESK validation
 
-Status: **development CI passed; app ZIP and DMG uploaded; physical-Mac testing pending**.
+Status: **foundation CI passed; new Ghost pet implementation awaits native CI; physical-Mac testing pending**.
 Do not interpret source parsing or upstream CI as proof that ONE DESK compiles,
 passes unit tests, renders smoothly, or works on physical hardware.
 
@@ -31,7 +31,16 @@ come from the exact upstream workflow; physical machine characteristics were not
 independently measured. A small API result snapshot is saved under
 `docs/validation/upstream-baseline.json`.
 
-## ONE DESK results
+## Ghost update (new, not covered by the foundation result)
+
+An optional Petdex Ghost appearance is implemented with larger native resting
+geometry, native sprite animation and explicit download/import. Ghost source
+artwork is not bundled. New tests cover atlas bounds/frame counts, reserved
+geometry, preference backup and asset rejection. Static parser, test generation,
+zsh syntax, actionlint and diff checks pass; native compilation/tests for this
+update are pending the new Actions run. See [Ghost documentation](docs/GHOST-PET.md).
+
+## ONE DESK foundation results
 
 | Validation | Result |
 | --- | --- |
