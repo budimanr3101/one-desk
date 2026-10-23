@@ -4805,7 +4805,10 @@ extension NotchService {
         let surface = ghostSurface(on: geometry)
         let width = surface?.width ?? geometry.collapsed.width
         let height = surface?.height ?? geometry.stripHeight
-        let size = surface.map { $0.height - 8 }
+        let size = surface.map { _ in
+            NotchGhostSupport.dimension(UserDefaults.standard.double(forKey: DefaultsKey.notchPetSize),
+                                        sideRoom: geometry.compactSideRoom)
+        }
         return NotchMascotSupport.track(stripWidth: width, stripHeight: height,
             wing: surface == nil ? geometry.restingWingWidth : max(0, (width - geometry.cameraWidth) / 2),
             cameraWidth: geometry.cameraWidth, floats: surface != nil && geometry.floats,

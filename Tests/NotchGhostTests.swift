@@ -53,6 +53,17 @@ enum NotchGhostTests {
         let track = NotchMascotSupport.track(stripWidth: 300, stripHeight: 60, wing: 60,
             cameraWidth: 180, floats: false, bodyHeight: 60, side: .right, sizeOverride: 52)
         suite.expect(track.size == 52, "resting Ghost retains its larger size in the Companion track")
+        for requested in [32.0, 52.0, 72.0] {
+            let dimension = NotchGhostSupport.dimension(requested, sideRoom: nil)
+            // A tall pre-existing island must not determine the character's size.
+            let surface = NotchGhostSupport.surface(base: CGSize(width: 400, height: 100),
+                cameraWidth: 180, screenWidth: 1440, dimension: dimension)
+            let sized = NotchMascotSupport.track(stripWidth: surface.width, stripHeight: surface.height,
+                wing: (surface.width - 180) / 2, cameraWidth: 180, floats: false,
+                bodyHeight: surface.height, side: .left, sizeOverride: dimension)
+            suite.expect(sized.size == CGFloat(requested),
+                         "pet size follows the requested dimension independently of the island height")
+        }
         for action in NotchGhostAction.allCases {
             suite.expect(action.duration > 0 && action.duration < 2, "Ghost actions have bounded timing")
             for frame in 0..<action.frameCount {

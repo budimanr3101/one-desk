@@ -41,13 +41,15 @@ struct NotchEyesSettings: View {
                     Text("A larger animated Ghost that idles, waves, jumps and changes expression. No cursor tracking.")
                         .font(.callout).foregroundStyle(.secondary)
                     if installed {
-                        NotchGhostView().frame(width: 96, height: 96)
+                        NotchGhostView().frame(width: petSize, height: petSize)
+                            .frame(width: 96, height: 96)
                             .padding(12).background(.black, in: RoundedRectangle(cornerRadius: 14))
                         NotchMascotStageCard(look: NotchMascotSupport.look(),
                             side: NotchMascotSide(rawValue: side) ?? .left,
                             awake: enabled, canGreet: enabled && NotchSupport.isEnabled(),
                             visits: visits, reactions: reactions, hides: hides,
-                            text: FeatureStrings.notchMascot(l10n.language), language: l10n.language)
+                            text: FeatureStrings.notchMascot(l10n.language), language: l10n.language,
+                            petSize: CGFloat(petSize))
                             .environment(\.notchGhostOverride, true)
                         behavior
                         Text("Pet size"); Slider(value: $petSize, in: 32...72, step: 2)

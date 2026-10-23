@@ -279,6 +279,7 @@ struct NotchMascotStageCard: View {
     let hides: Bool
     let text: NotchMascotStrings
     let language: AppLanguage
+    var petSize: CGFloat? = nil
     @State private var visit: NotchMascotVisit?
     @State private var reaction: NotchMascotReactionEvent?
     @State private var playing: NotchMascotMoment?
@@ -295,7 +296,7 @@ struct NotchMascotStageCard: View {
             GeometryReader { proxy in
                 NotchMascotStage(look: look, side: side, awake: awake, visit: visit, reaction: reaction,
                                  caption: playing.map { (text.moment($0, language: language), $0.symbol) },
-                                 width: proxy.size.width)
+                                 width: proxy.size.width, petSize: petSize)
                     .contentShape(Rectangle())
                     .onTapGesture { playNext() }
             }
@@ -457,13 +458,14 @@ private struct NotchMascotStage: View {
     /// The moment it acts out, named under the island while it plays.
     let caption: (title: String, symbol: String)?
     let width: CGFloat
+    var petSize: CGFloat? = nil
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     static let height: CGFloat = 104
 
     var body: some View {
-        let model = NotchMascotStageModel(side: side)
+        let model = NotchMascotStageModel(side: side, petSize: petSize)
         let scale = model.scale(toFit: width)
         let island = CGSize(width: model.strip.width * scale, height: model.strip.height * scale)
         let bar = model.menuBarHeight * scale
@@ -572,13 +574,21 @@ struct NotchMascotStageModel {
     let hasCamera: Bool
 
     init(side: NotchMascotSide, geometry live: NotchGeometry = NotchService.shared.geometry,
-         islandRuns: Bool = NotchService.shared.running) {
+         islandRuns: Bool = NotchService.shared.running, petSize: CGFloat? = nil) {
         // An island that is not running has not measured its display.
         let usable = islandRuns && live.screen.width > 0 && live.stripHeight >= 16
         let geometry = usable ? live : Self.template
         floatingGap = geometry.floatingGap
         hasCamera = geometry.isNotched
-        if geometry.floats {
+        if let petSize {
+            let dimension = NotchGhostSupport.dimension(Double(petSize), sideRoom: nil)
+            strip = NotchGhostSupport.surface(base: geometry.collapsed,
+                cameraWidth: geometry.cameraWidth, screenWidth: geometry.screen.width, dimension: dimension)
+            menuBarHeight = max(geometry.menuBarHeight, strip.height)
+            track = NotchMascotSupport.track(stripWidth: strip.width, stripHeight: strip.height,
+                wing: max(0, (strip.width - geometry.cameraWidth) / 2), cameraWidth: geometry.cameraWidth,
+                floats: geometry.floats, bodyHeight: strip.height, side: side, sizeOverride: dimension)
+        } else if geometry.floats {
             let size = geometry.restingSize(showsContent: false)
             strip = size
             menuBarHeight = max(geometry.menuBarHeight, size.height)

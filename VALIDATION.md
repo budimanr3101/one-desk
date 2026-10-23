@@ -182,3 +182,11 @@ On a Mac verify left/right movement, idle hide/visit wake, each preview/event
 reaction, music/timer/download reactions, both Command Bar styles, Reduce Motion,
 multi-display/fullscreen and switching back to classic Companion. Visual smoothness
 and hardware behavior have not been verified by the developer.
+
+## Pet size slider correction
+
+The resting character now receives the requested dimension directly rather than
+deriving it from its enclosing surface height. Both the sprite preview and the
+interactive Companion stage receive the same slider size. Added regression cases
+cover 32/52/72-point characters inside an independently taller island. Static
+checks pass on Linux; macOS CI and physical confirmation remain pending for this fix.
