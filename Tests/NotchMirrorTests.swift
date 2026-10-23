@@ -74,6 +74,8 @@ enum NotchMirrorContract {
         var compactActivity: NotchCompactActivity?
         var compactCompanion: NotchCompactActivity?
         var idleContent = NotchIdleContent.none
+        var ghostSize: CGSize?
+        func ghostSurface(on geometry: NotchGeometry) -> CGSize? { ghostSize }
         var eyesVisible = false
         func eyesShow(on geometry: NotchGeometry) -> Bool {
             eyesVisible && (geometry.floats || geometry.restingWingWidth > 0)

@@ -4,6 +4,7 @@ import Foundation
 
 enum NotchEyesTests {
     static func run(_ suite: TestSuite) {
+        NotchGhostTests.run(suite)
         var installations = 0, removals = 0
         var lifecycle: NotchEyesLifecycle? = NotchEyesLifecycle()
         let install: () -> (() -> Void) = { installations += 1; return { removals += 1 } }

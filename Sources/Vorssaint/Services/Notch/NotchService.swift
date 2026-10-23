@@ -457,7 +457,9 @@ final class NotchService: ObservableObject {
 
     /// Decorative content reserves existing wings only; animation timelines stay unchanged.
     func eyesShow(on geometry: NotchGeometry) -> Bool {
-        NotchEyesSupport.visible(
+        guard UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) != "ghost"
+            || NotchGhostAssets.isInstalled else { return false }
+        return NotchEyesSupport.visible(
             enabled: UserDefaults.standard.bool(forKey: DefaultsKey.notchEyesEnabled),
             available: running && AppFeature.notchEyes.isAvailable && AppFeature.notch.isAvailable
                 && UserDefaults.standard.bool(forKey: DefaultsKey.notchEnabled),
@@ -467,9 +469,20 @@ final class NotchService: ObservableObject {
             && (geometry.floats || geometry.restingWingWidth > 0)
     }
 
+    /// Ghost is larger than the eye strip, but uses the same host and priority gate.
+    func ghostSurface(on geometry: NotchGeometry) -> CGSize? {
+        guard eyesShow(on: geometry), UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) == "ghost",
+              NotchGhostAssets.isInstalled else { return nil }
+        let dimension = NotchGhostSupport.dimension(UserDefaults.standard.double(forKey: DefaultsKey.notchPetSize),
+                                                   sideRoom: geometry.compactSideRoom)
+        return NotchGhostSupport.surface(base: geometry.collapsed, cameraWidth: geometry.cameraWidth,
+                                         screenWidth: geometry.screen.width, dimension: dimension)
+    }
+
     private var eyesWantsRoom: Bool {
         AppFeature.notchEyes.isAvailable && UserDefaults.standard.bool(forKey: DefaultsKey.notchEyesEnabled)
             && idleContent == .none && !mascotOn
+            && (UserDefaults.standard.string(forKey: DefaultsKey.notchEyesStyle) != "ghost" || NotchGhostAssets.isInstalled)
     }
 
     /// The camera side it rests on, as the island last synced it, so a side
@@ -955,7 +968,8 @@ final class NotchService: ObservableObject {
                                           reach: named.map { ($0.leading - $0.trailing) / 2 } ?? 0)
                 : resting
         }
-        let resting = geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry) || eyesShow(on: geometry))
+        let resting = ghostSurface(on: geometry)
+            ?? geometry.restingSize(showsContent: idleContent != .none || mascotShows(on: geometry) || eyesShow(on: geometry))
         return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 
@@ -986,7 +1000,7 @@ final class NotchService: ObservableObject {
         if peeking || showsCompactActivityPicker { return nil }
         // At rest the charge or the allowance fits inside the bare capsule.
         let resting = compactActivity.map { capsuleStripSize(for: $0, companion: compactCompanion) }
-            ?? geometry.restingSize(showsContent: false)
+            ?? ghostSurface(on: geometry) ?? geometry.restingSize(showsContent: false)
         return hoverEmphasized ? NotchHoverEmphasis.size(from: resting, geometry: geometry) : resting
     }
 
@@ -3107,7 +3121,7 @@ final class NotchService: ObservableObject {
     /// for that display, or the island at rest there.
     private func mirrorSurface(on base: NotchGeometry, activity: NotchCompactActivity?) -> (strip: NotchGeometry, size: CGSize) {
         guard let activity else {
-            return (base, base.restingSize(showsContent: !base.floats && (idleContent != .none || mascotShows(on: base) || eyesShow(on: base))))
+            return (base, ghostSurface(on: base) ?? base.restingSize(showsContent: !base.floats && (idleContent != .none || mascotShows(on: base) || eyesShow(on: base))))
         }
         let companion = compactCompanion
         if base.floats { return (base, capsuleStripSize(for: activity, companion: companion, geometry: base)) }

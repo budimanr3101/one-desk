@@ -7,6 +7,9 @@ import Foundation
 
 /// Every UserDefaults key used by the app, in one place.
 enum DefaultsKey {
+    static let notchPetSize = "notchPetSize"
+    static let notchPetAnimations = "notchPetAnimations"
+    static let notchPetAssetRevision = "notchPetAssetRevision"
     static let notchEyesEnabled = "notchEyesEnabled"
     static let notchEyesStyle = "notchEyesStyle"
     static let notchEyesSize = "notchEyesSize"
@@ -1195,6 +1198,9 @@ enum Defaults {
     static let allowedMonitorAlertCooldowns = [2, 5, 15, 30, 60]
 
     static let registeredDefaults: [String: Any] = [
+        DefaultsKey.notchPetSize: 52.0,
+        DefaultsKey.notchPetAnimations: true,
+        DefaultsKey.notchPetAssetRevision: "",
         DefaultsKey.notchEyesEnabled: false,
         DefaultsKey.notchEyesStyle: "round",
         DefaultsKey.notchEyesSize: 14.0,

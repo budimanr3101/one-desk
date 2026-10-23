@@ -658,6 +658,9 @@ struct NotchRestingStrip: View {
     var displayGeometry: NotchGeometry? = nil
     @ObservedObject private var music = NotchMusicService.shared
     @ObservedObject private var features = FeatureRuntime.shared
+    @AppStorage(DefaultsKey.notchPetAssetRevision) private var petRevision = ""
+    @AppStorage(DefaultsKey.notchPetSize) private var petSize = 52.0
+    @AppStorage(DefaultsKey.notchEyesStyle) private var eyeStyle = "round"
     @AppStorage(DefaultsKey.notchEyesEnabled) private var eyesEnabled = false
     @AppStorage(DefaultsKey.notchLowBatteryTint) private var lowBatteryTint = false
     @AppStorage(DefaultsKey.notchLowBatteryThreshold) private var lowBatteryThreshold = NotchSupport.defaultLowBatteryThreshold
@@ -665,6 +668,14 @@ struct NotchRestingStrip: View {
     @AppStorage(DefaultsKey.notchLowBatteryEarlyThreshold) private var earlyBatteryThreshold = NotchSupport.defaultEarlyBatteryThreshold
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private var ghostSurface: CGSize? {
+        // Asset revision invalidates the view after an explicit download/import.
+        _ = petRevision
+        return eyeStyle == "ghost" ? service.ghostSurface(on: geometry) : nil
+    }
+    private var ghostDimension: CGFloat {
+        NotchGhostSupport.dimension(petSize, sideRoom: geometry.compactSideRoom)
+    }
     private var geometry: NotchGeometry { displayGeometry ?? service.geometry }
 
     private var batteryTint: Color {
@@ -744,9 +755,17 @@ struct NotchRestingStrip: View {
                 } else { Color.clear }
             }
             if eyesEnabled, features.isAvailable(.notchEyes), service.eyesShow(on: geometry) {
-                NotchEyesView(cameraWidth: geometry.cameraWidth, wingWidth: geometry.restingWingWidth)
-                    .frame(width: geometry.collapsed.width, height: geometry.stripHeight)
-                    .allowsHitTesting(false)
+                if let surface = ghostSurface {
+                    NotchGhostView()
+                        .frame(width: ghostDimension, height: ghostDimension)
+                        .offset(x: geometry.floats ? 0 : geometry.cameraWidth / 2 + ghostDimension / 2 + 4)
+                        .frame(width: surface.width, height: surface.height)
+                        .allowsHitTesting(false)
+                } else if eyeStyle != "ghost" {
+                    NotchEyesView(cameraWidth: geometry.cameraWidth, wingWidth: geometry.restingWingWidth)
+                        .frame(width: geometry.collapsed.width, height: geometry.stripHeight)
+                        .allowsHitTesting(false)
+                }
             }
             if service.mascotShows(on: geometry) {
                 NotchMascotTrackView(look: NotchMascotSupport.look(),
@@ -770,7 +789,7 @@ struct NotchRestingStrip: View {
         // The strip stays in its band at the top: hover grows the island
         // around it, and centring it in the taller shape dropped it half
         // the growth in one frame.
-        .frame(height: geometry.stripHeight)
+        .frame(height: ghostSurface?.height ?? geometry.stripHeight)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .contentShape(Rectangle())
         .accessibilityHidden(true)

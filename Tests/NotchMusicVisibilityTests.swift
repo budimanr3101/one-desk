@@ -69,6 +69,8 @@ enum NotchMusicVisibilityTests {
         var showingCommandBar = false
         var commandBarClosings = 0
         var commandBarSurfaceSize = CGSize(width: 616, height: 132)
+        var ghostSize: CGSize?
+        func ghostSurface(on geometry: NotchGeometry) -> CGSize? { ghostSize }
         var eyesVisible = false
         func eyesShow(on geometry: NotchGeometry) -> Bool {
             eyesVisible && (geometry.floats || geometry.restingWingWidth > 0)
@@ -226,6 +228,10 @@ enum NotchMusicVisibilityTests {
             reader.playback = nil
             suite.expect(eyesLayout.surfaceSize == eyesLayout.geometry.collapsed,
                          "eyes reserve resting wings without a competing activity: got \(eyesLayout.surfaceSize), expected \(eyesLayout.geometry.collapsed)")
+            eyesLayout.ghostSize = CGSize(width: 340, height: 60)
+            suite.expect(eyesLayout.surfaceSize == eyesLayout.ghostSize,
+                         "Ghost can reserve a taller, wider resting surface without changing the animation host")
+            eyesLayout.ghostSize = nil
             reader.playback = savedPlayback
             defaults.set(NotchIdleContent.music.rawValue, forKey: DefaultsKey.notchIdleContent)
             defaults.set(true, forKey: DefaultsKey.notchShowPlayingMusic)
