@@ -110,7 +110,7 @@ are historical context, superseded for this fork by the cloud build instructions
 
 Install **Live Translate** from Features, then open **Quick Tools → Live Translate**.
 Choose English ↔ Indonesian and microphone/system audio, accept the provider
-disclosure, then Start. Includes floating subtitles, optional island notices and
+disclosure, then Start. Includes an island Live Translate page, compact island captions and
 Control–Option–Shift–T start/stop. Uses Apple Speech and online MyMemory translation;
 Internet, provider quotas and host speech-language availability apply. No audio or
 transcript files are saved. See [setup and limitations](docs/LIVE-TRANSLATE.md).

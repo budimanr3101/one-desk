@@ -8,7 +8,6 @@ struct LiveTranslateSettings: View {
     @AppStorage(DefaultsKey.liveTranslateConsent) private var consent = false
     @AppStorage(DefaultsKey.liveTranslateDirection) private var direction = "englishIndonesian"
     @AppStorage(DefaultsKey.liveTranslateInput) private var input = "microphone"
-    @AppStorage(DefaultsKey.liveTranslateSubtitles) private var subtitles = true
     @AppStorage(DefaultsKey.liveTranslateNotch) private var notch = true
     @AppStorage(DefaultsKey.liveTranslateShortcutEnabled) private var shortcut = false
     var body: some View {
@@ -24,9 +23,8 @@ struct LiveTranslateSettings: View {
                 .font(.callout).foregroundStyle(.secondary)
             Link("MyMemory service and privacy", destination: URL(string: "https://mymemory.translated.net/doc/en/tos.php")!)
             Toggle("I agree to send recognized text to MyMemory when I press Start", isOn: $consent)
-            Toggle("Floating live subtitles", isOn: $subtitles)
             Toggle("Show translations in Dynamic Island", isOn: $notch)
-            Text("Island translations yield to existing notices. Full text remains below and in subtitles.").font(.caption).foregroundStyle(.secondary)
+            Text("Live subtitles appear in the island. Open its Live Translate section for full text and Start/Stop controls. Existing notices take priority.").font(.caption).foregroundStyle(.secondary)
             Toggle("Global start/stop shortcut: ⌃⌥⇧T", isOn: $shortcut)
             if service.shortcutFailed { Text("Shortcut is already in use. Choose another app's shortcut or disable it there.").foregroundStyle(.red) }
             HStack {
@@ -51,21 +49,6 @@ struct LiveTranslateSettings: View {
         .onChange(of: enabled) { _, _ in service.syncWithPreferences() }
         .onChange(of: consent) { _, _ in service.syncWithPreferences() }
         .onChange(of: shortcut) { _, _ in service.syncWithPreferences() }
-        .onChange(of: subtitles) { _, _ in service.syncWithPreferences() }
         .onChange(of: notch) { _, value in if !value { NotchService.shared.dismissTranslationNotice() } }
-    }
-}
-
-struct LiveTranslationSubtitle: View {
-    @ObservedObject var service: LiveTranslateService
-    var body: some View {
-        VStack(spacing: 6) {
-            Text("ONE DESK · Live Translate").font(.caption).foregroundStyle(.white.opacity(0.7))
-            Text(service.translation).font(.system(size: 22, weight: .medium)).lineLimit(3)
-            Text(service.transcript).font(.caption).foregroundStyle(.white.opacity(0.75)).lineLimit(2)
-        }
-        .foregroundStyle(.white).padding(16).frame(maxWidth: .infinity)
-        .background(.black.opacity(0.85), in: RoundedRectangle(cornerRadius: 14))
-        .accessibilityElement(children: .combine)
     }
 }

@@ -29,7 +29,7 @@ struct QuickToolsSettings: View {
             if AppFeature.liveTranslate.isAvailable {
                 Section("Live Translate") {
                     LiveTranslateSettings()
-                    Button("Open Live Translate window") { LiveTranslateService.shared.show() }
+                    Button("Open Live Translate in the island") { LiveTranslateService.shared.show() }
                 }
             }
             if AppFeature.quickLauncher.isAvailable {

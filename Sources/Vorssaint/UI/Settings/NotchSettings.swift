@@ -526,6 +526,8 @@ struct NotchSettings: View {
                 ScreenshotDefaultActionPicker(strings: FeatureStrings.screenshot(l10n.language), selection: $captureAction)
                     .padding(.leading, settingsRowTextInset)
             }
+        case .translate:
+            Button("Open Live Translate in the island") { NotchService.shared.open(.translate) }
         case .scratchpad:
             destination(FeatureStrings.scratchpad(l10n.language).pageTitle, symbol: "note.text", value: $scratchpad)
         case .agents:
@@ -865,6 +867,7 @@ struct NotchSettings: View {
         case .timer: return .notchTimer
         case .camera: return .cameraPreview
         case .downloads: return .notchDownloads
+        case .translate: return .liveTranslate
         case .scratchpad: return .scratchpad
         case .agents: return .notchAgents
         case .watch: return .notchWatch

@@ -45,7 +45,6 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
     private var input = LiveTranslateInput.microphone
     private let hotkey = QuickToolHotkey(id: 82)
     private var controls: NSPanel?
-    private var subtitles: NSPanel?
     private let network = URLSession(configuration: .ephemeral)
     override private init() {
         super.init()
@@ -63,10 +62,13 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
             storageKey: DefaultsKey.liveTranslateShortcut)
         if !enabled || !UserDefaults.standard.bool(forKey: DefaultsKey.liveTranslateConsent) { stop() }
         if !AppFeature.liveTranslate.isAvailable { controls?.close(); controls = nil }
-        if !UserDefaults.standard.bool(forKey: DefaultsKey.liveTranslateSubtitles) { subtitles?.orderOut(nil) }
     }
     func show() {
         guard AppFeature.liveTranslate.isAvailable else { return }
+        if NotchSupport.isEnabled() {
+            NotchService.shared.open(.translate)
+            return
+        }
         if controls == nil {
             let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 600, height: 580),
                 styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
@@ -82,6 +84,7 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
               UserDefaults.standard.bool(forKey: DefaultsKey.liveTranslateConsent) else { return }
         direction = LiveTranslateDirection(rawValue: UserDefaults.standard.string(forKey: DefaultsKey.liveTranslateDirection) ?? "") ?? .englishIndonesian
         input = LiveTranslateInput(rawValue: UserDefaults.standard.string(forKey: DefaultsKey.liveTranslateInput) ?? "") ?? .microphone
+        if NotchSupport.isEnabled() { NotchService.shared.open(.translate) }
         let token = UUID(); session = token; starting = true; error = nil
         let workspace = NSWorkspace.shared.notificationCenter
         for name in [NSWorkspace.willSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
@@ -226,33 +229,19 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
         translateTask?.cancel(); translateTask = nil
         let previous = clearCapture()
         if let previous { Task { try? await previous.stopCapture() } }
-        starting = false; running = false; subtitles?.orderOut(nil)
+        starting = false; running = false
         NotchService.shared.dismissTranslationNotice()
     }
     func clearText() {
         translateTask?.cancel(); translateTask = nil; translationID = UUID()
         transcript = ""; translation = ""; error = nil; lastSubmitted = ""
-        subtitles?.orderOut(nil); NotchService.shared.dismissTranslationNotice()
+        NotchService.shared.dismissTranslationNotice()
     }
     func windowWillClose(_ notification: Notification) {
         if let window = notification.object as? NSWindow, window === controls { stop() }
     }
     func suspend() { hotkey.unregister(); stop(); controls?.close() }
     private func presentTranslation() {
-        if UserDefaults.standard.bool(forKey: DefaultsKey.liveTranslateSubtitles) {
-            if subtitles == nil {
-                let panel = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
-                panel.isOpaque = false; panel.backgroundColor = .clear; panel.level = .floating
-                panel.ignoresMouseEvents = true; panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-                panel.isReleasedWhenClosed = false; subtitles = panel
-            }
-            subtitles?.contentView = NSHostingView(rootView: LiveTranslationSubtitle(service: self))
-            if let screen = NSScreen.main {
-                let area = screen.visibleFrame; let width = min(760, max(200, area.width - 48))
-                subtitles?.setFrame(NSRect(x: area.midX - width / 2, y: area.minY + 48, width: width, height: 140), display: true)
-            }
-            subtitles?.orderFrontRegardless()
-        }
         if UserDefaults.standard.bool(forKey: DefaultsKey.liveTranslateNotch),
            NotchService.shared.notice == nil || NotchService.shared.notice?.event == .translation {
             NotchService.shared.show(NotchNotice(event: .translation, title: "Live Translate", detail: translation, symbol: "character.bubble"))

@@ -74,7 +74,8 @@ final class NotchEyesRig {
     private func move(_ gaze: CGPoint) {
         for i in pupils.indices {
             let d = eyes[i].bounds.width
-            let target = CGPoint(x: d / 2 + gaze.x * d * 0.18, y: d / 2 + gaze.y * d * (slim ? 0.08 : 0.18))
+            let offset = NotchEyesSupport.pupilOffset(gaze: gaze, diameter: d, slim: slim, flipped: true)
+            let target = CGPoint(x: d / 2 + offset.x, y: d / 2 + offset.y)
             let from = pupils[i].presentation()?.position ?? pupils[i].position
             CATransaction.begin(); CATransaction.setDisableActions(true)
             pupils[i].position = target; CATransaction.commit()

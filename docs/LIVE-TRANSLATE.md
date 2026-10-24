@@ -3,8 +3,11 @@
 Install **Live Translate** in Settings → Features, then open its settings in
 Quick Tools. Enable it, choose English → Indonesian or Indonesian → English,
 choose Microphone or System audio, read the disclosure, consent, and press Start.
-A separate control window is also available. Stop always cancels pending start,
-recognition, capture, translation, scheduled session rotation and subtitle display.
+With Dynamic Island enabled, Start and Open route to its **Live Translate** section
+(also available in the island section picker, shortcut letter L). Full captions and
+controls live there. There is no bottom-of-screen subtitle panel. A separate
+control window remains a fallback only when Dynamic Island is disabled. Stop always cancels pending start,
+recognition, capture, translation, scheduled session rotation and island subtitle display.
 Closing the separate controls, locking/sleeping the Mac, switching sessions,
 disabling or uninstalling the module also stops capture. No automatic resume.
 
@@ -35,12 +38,11 @@ as an MVP, not authoritative translation; provider replacement is a priority.
 Translation errors and provider quota responses are visible and do not masquerade
 as successful captions.
 
-Optional native floating subtitles ignore mouse clicks and join Spaces/fullscreen.
-They appear on the currently main display on each translated update. Optional
-island notices reuse the original window/layout/animation architecture, with a new
-lowest-priority translation event. Existing notices always take priority; the
-subtitle panel and control window retain full text while the compact island may
-truncate. No changes to NotchWindowHost or its animation timings were required.
+Subtitles use the existing island notice host and animation architecture, with a
+lowest-priority translation event. Existing notices always take priority. The
+island's expanded Live Translate section retains full text and Start/Stop controls;
+the compact notice can truncate. The previous floating subtitle preference is
+ignored for compatibility: no separate subtitle window is created.
 
 The optional global start/stop shortcut is Control–Option–Shift–T using the existing
 QuickToolHotkey lifecycle. Conflicts are reported; it is disabled by default.

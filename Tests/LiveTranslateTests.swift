@@ -48,8 +48,12 @@ enum LiveTranslateTests {
         defaults.set(true, forKey: DefaultsKey.notchEnabled)
         defaults.set(true, forKey: AppFeature.notch.availabilityKey)
         suite.expect(NotchSupport.routes(.translation, in: defaults), "enabled translation can present through the existing island notice router")
+        suite.expect(NotchSupport.modules(in: defaults).contains(.translate)
+            && NotchModule.translate.shortcutKey == "l",
+            "installed Live Translate has its own island section and direct navigation key")
         defaults.set(false, forKey: AppFeature.liveTranslate.availabilityKey)
-        suite.expect(!NotchSupport.routes(.translation, in: defaults), "uninstalled translation cannot present island notices")
+        suite.expect(!NotchSupport.modules(in: defaults).contains(.translate)
+            && !NotchSupport.routes(.translation, in: defaults), "uninstalled translation cannot present island notices")
         for event in NotchEvent.allCases where event != .translation {
             suite.expect(event.priority > NotchEvent.translation.priority, "translation yields to every existing island notice")
         }

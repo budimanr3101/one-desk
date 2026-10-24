@@ -238,3 +238,15 @@ Other translated permissions remain. Translating the new capture disclosures is
 pending. Source parsing, generated tests, permission fallback consistency, shell
 syntax, actionlint, preference cleanup and diff checks pass on Linux. Native
 unit-test rerun and packaging for this correction remain pending CI.
+
+## Island-first translation and neutral pupil correction
+
+Live Translate now has a native island section (L) for full captions and controls.
+Start/Open routes into that section when the island is enabled. Removed the
+bottom floating subtitle window, including for installations with its old setting
+enabled. Compact captions retain existing lowest-priority notice routing.
+Gaze is normalized around screen.midY instead of screen.maxY; flipped Companion
+layers invert the desktop y offset, while the legacy unflipped eye host does not.
+Regression coverage includes neutral center, both styles' up/down mapping, negative
+display origins, and translation-section installation/removal/navigation. Static
+checks pass; native CI and physical visual confirmation remain pending.

@@ -596,6 +596,10 @@ struct NotchView: View {
             // The launcher hands the row its own controls, which a row set
             // here would replace.
             case .tools: QuickLauncherView(notchSize: pageSize)
+            case .translate:
+                ScrollView {
+                    NotchLiveTranslateView()
+                }.frame(width: pageSize.width, height: pageSize.height)
             case .scratchpad: NotchScratchpadView(service: service)
             case .agents: NotchAgentsView(size: pageSize)
             case .watch: NotchWatchView(size: pageSize)
@@ -847,6 +851,7 @@ extension NotchModule: PanelOrderItem {
         case .files: return FeatureStrings.notch(language).files
         case .system: return FeatureStrings.notch(language).system
         case .tools: return FeatureStrings.notch(language).tools
+        case .translate: return "Live Translate"
         case .scratchpad: return FeatureStrings.scratchpad(language).pageTitle
         case .agents: return FeatureStrings.notchAgents(language).title
         case .watch: return FeatureStrings.notchWatch(language).title

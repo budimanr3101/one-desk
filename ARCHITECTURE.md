@@ -123,7 +123,8 @@ The service uses AVAudioEngine for microphone or ScreenCaptureKit for system
 audio, Apple Speech for transcription and a bounded/debounced MyMemory request
 for EN/ID translation. Session/request identities reject stale asynchronous work.
 Capture, scheduled recognition rotation, hotkey registration and subtitle windows
-are torn down on stop/disable/session exit. Subtitles are native click-through
-NSPanels; island notices reuse the existing host with lowest event priority.
+are torn down on stop/disable/session exit. Subtitles and controls live in the native island translate section; compact
+notices reuse the existing host with lowest event priority. The former bottom
+subtitle NSPanel has been removed.
 LiveTranslateSupport holds pure request/direction/bounding/response policy for
 offline deterministic tests. See docs/LIVE-TRANSLATE.md for data flow/limitations.

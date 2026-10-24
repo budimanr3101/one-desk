@@ -10,10 +10,15 @@ enum NotchEyesSupport {
               cursor.x.isFinite, cursor.y.isFinite else { return .zero }
         let gain = sensitivity.isFinite ? min(2, max(0.2, sensitivity)) : 1
         var x = (cursor.x - screen.midX) / (screen.width / 2) * gain
-        var y = (cursor.y - screen.maxY) / (screen.height / 2) * gain
+        var y = (cursor.y - screen.midY) / (screen.height / 2) * gain
         let length = hypot(x, y)
         if length > 1 { x /= length; y /= length }
         return CGPoint(x: x, y: y)
+    }
+    /// The Companion host has flipped layer coordinates (positive y is down).
+    static func pupilOffset(gaze: CGPoint, diameter: CGFloat, slim: Bool, flipped: Bool) -> CGPoint {
+        CGPoint(x: gaze.x * diameter * 0.18,
+                y: gaze.y * diameter * (slim ? 0.08 : 0.18) * (flipped ? -1 : 1))
     }
     static func visible(enabled: Bool, available: Bool, expanded: Bool,
                         activity: Bool, companion: Bool, idleEmpty: Bool) -> Bool {

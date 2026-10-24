@@ -168,6 +168,7 @@ struct NotchPagePreview: View {
         case .files: NotchFilesView(service: notch)
         case .system: NotchSystemView(size: size) { _ in }
         case .tools: QuickLauncherView(notchSize: size)
+        case .translate: Text("Live Translate · English ↔ Indonesian").padding()
         case .scratchpad: NotchScratchpadStill()
         case .agents:
             // Off, nothing reads the logs, so the page would wait forever.
@@ -403,6 +404,7 @@ extension NotchModule {
         case .timer: return .mint
         case .camera: return .teal
         case .downloads: return .blue
+        case .translate: return .cyan
         case .scratchpad: return .yellow
         case .agents: return Color(red: 0.85, green: 0.47, blue: 0.34)
         case .watch: return .purple

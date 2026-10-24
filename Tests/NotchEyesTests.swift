@@ -31,8 +31,15 @@ enum NotchEyesTests {
             DefaultsKey.notchEyesSize, DefaultsKey.notchEyesStyle, DefaultsKey.notchEyesSensitivity,
             DefaultsKey.notchEyesBlink, DefaultsKey.notchEyesIdle]), "every eye setting participates in backups")
         let display = CGRect(x: -1920, y: -1080, width: 1920, height: 1080)
-        let center = CGPoint(x: display.midX, y: display.maxY)
-        suite.expect(NotchEyesSupport.gaze(cursor: center, screen: display, sensitivity: 1) == .zero, "camera origin has neutral gaze")
+        let center = CGPoint(x: display.midX, y: display.midY)
+        suite.expect(NotchEyesSupport.gaze(cursor: center, screen: display, sensitivity: 1) == .zero, "monitor center has neutral gaze")
+        for slim in [false, true] {
+            suite.expect(NotchEyesSupport.pupilOffset(gaze: .zero, diameter: 14, slim: slim, flipped: true) == .zero,
+                         "both styles center their pupils at neutral gaze")
+            let up = NotchEyesSupport.pupilOffset(gaze: CGPoint(x: 0, y: 1), diameter: 14, slim: slim, flipped: true)
+            let down = NotchEyesSupport.pupilOffset(gaze: CGPoint(x: 0, y: -1), diameter: 14, slim: slim, flipped: true)
+            suite.expect(up.y < 0 && down.y > 0, "AppKit desktop up/down maps correctly into flipped Companion layers")
+        }
         for offset in [CGPoint(x: -100, y: 0), CGPoint(x: 100, y: 0), CGPoint(x: 0, y: -100), CGPoint(x: 0, y: 100)] {
             let gaze = NotchEyesSupport.gaze(cursor: CGPoint(x: center.x + offset.x, y: center.y + offset.y), screen: display, sensitivity: 1)
             suite.expect(gaze.x * offset.x + gaze.y * offset.y > 0, "gaze follows each desktop direction")
