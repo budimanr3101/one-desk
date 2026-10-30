@@ -15,6 +15,17 @@ enum LiveTranslateInput: String, CaseIterable, Identifiable {
     var label: String { self == .microphone ? "Microphone" : "System audio" }
 }
 enum LiveTranslateSupport {
+    static func words(_ text: String) -> [String] {
+        text.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+    }
+
+    /// Return complete short phrases. Five-word chunks are sent as soon as
+    /// recognition produces them; a shorter tail can be flushed after a pause.
+    static func phrase(_ words: [String], from start: Int, count: Int) -> String {
+        guard start >= 0, count > 0, start < words.count else { return "" }
+        return words[start..<min(words.count, start + count)].joined(separator: " ")
+    }
+
     /// MyMemory accepts at most 500 UTF-8 bytes. Keep the latest spoken words,
     /// not a permanently frozen prefix of a long-running recognition session.
     static func excerpt(_ text: String, byteLimit: Int = 450) -> String {

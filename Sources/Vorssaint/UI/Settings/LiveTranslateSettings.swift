@@ -19,7 +19,7 @@ struct LiveTranslateSettings: View {
             Picker("Audio source", selection: $input) {
                 ForEach(LiveTranslateInput.allCases) { Text($0.label).tag($0.rawValue) }
             }.disabled(service.running || service.starting)
-            Text("Start requests Speech Recognition and your selected audio permission. Apple transcribes speech (on device when supported; otherwise using Apple's service). The latest recognized text is sent to MyMemory for English ↔ Indonesian translation. Internet and provider quota apply; crowd-sourced matches can be inaccurate. Audio/text are not saved by ONE DESK.")
+            Text("Start requests Speech Recognition and your selected audio permission. Apple transcribes speech (on device when supported; otherwise using Apple's service). Live Translate sends phrases of up to five words as they are recognized, then translates short pauses after a moment. Recognized text is sent to MyMemory for English ↔ Indonesian translation. Internet and provider quota apply; crowd-sourced matches can be inaccurate. Audio/text are not saved by ONE DESK.")
                 .font(.callout).foregroundStyle(.secondary)
             Link("MyMemory service and privacy", destination: URL(string: "https://mymemory.translated.net/doc/en/tos.php")!)
             Toggle("I agree to send recognized text to MyMemory when I press Start", isOn: $consent)

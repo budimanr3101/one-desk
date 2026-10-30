@@ -29,16 +29,19 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
     @Published private(set) var shortcutFailed = false
     private var session: UUID?
     private var recognitionID = UUID()
-    private var translationID = UUID()
     private var startTask: Task<Void, Never>?
-    private var translateTask: Task<Void, Never>?
     private var rotateTask: Task<Void, Never>?
     private var speechTask: SFSpeechRecognitionTask?
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var engine: AVAudioEngine?
     private var stream: SCStream?
     private var output: TranslationAudioOutput?
-    private var lastSubmitted = ""
+    private var submittedWordCount = 0
+    private var latestRecognizedWords: [String] = []
+    private var speechPauseTask: Task<Void, Never>?
+    private var translationQueue: [String] = []
+    private var translationWorker: Task<Void, Never>?
+    private var translatedPhrases: [String] = []
     private var sessionObservers: [NSObjectProtocol] = []
     private var lockObserver: NSObjectProtocol?
     private var direction = LiveTranslateDirection.englishIndonesian
@@ -92,7 +95,9 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
         }
         lockObserver = DistributedNotificationCenter.default().addObserver(
             forName: NSNotification.Name("com.apple.screenIsLocked"), object: nil, queue: .main) { [weak self] _ in self?.stop() }
-        transcript = ""; translation = ""; lastSubmitted = ""
+        transcript = ""; translation = ""
+        submittedWordCount = 0; latestRecognizedWords = []
+        translationQueue.removeAll(); translatedPhrases.removeAll()
         startTask = Task { @MainActor [weak self] in
             guard let self else { return }
             do {
@@ -122,6 +127,9 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
         request.requiresOnDeviceRecognition = recognizer.supportsOnDeviceRecognition
+        submittedWordCount = 0
+        latestRecognizedWords = []
+        speechPauseTask?.cancel(); speechPauseTask = nil
         self.request = request
         let epoch = UUID(); recognitionID = epoch
         speechTask = recognizer.recognitionTask(with: request) { [weak self] result, failure in
@@ -129,7 +137,7 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
                 guard let self, self.session == token, self.recognitionID == epoch else { return }
                 if let result {
                     self.transcript = String(result.bestTranscription.formattedString.suffix(2000))
-                    self.submit(self.transcript)
+                    self.submit(self.transcript, final: result.isFinal)
                     if result.isFinal { self.rotate(token: token, after: 0.3) }
                 } else if let failure {
                     self.stop(); self.error = failure.localizedDescription
@@ -183,30 +191,69 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
             catch { if self.session == token { self.stop(); self.error = error.localizedDescription } }
         }
     }
-    private func submit(_ text: String) {
-        let excerpt = LiveTranslateSupport.excerpt(text)
-        guard !excerpt.isEmpty, excerpt != lastSubmitted else { return }
-        translateTask?.cancel()
-        let id = UUID(); translationID = id
-        let direction = self.direction
-        translateTask = Task { @MainActor [weak self] in
-            do {
-                try await Task.sleep(nanoseconds: 800_000_000)
-                guard let self, self.session != nil, self.translationID == id,
-                      let request = LiveTranslateSupport.request(text: excerpt, direction: direction) else { return }
-                self.lastSubmitted = excerpt
-                let (data, response) = try await self.network.data(for: request)
-                guard !Task.isCancelled, self.session != nil, self.translationID == id else { return }
-                guard let http = response as? HTTPURLResponse, http.statusCode == 200, data.count <= 131072 else {
-                    throw Self.failure("Translation service rejected the request. Try again later.")
-                }
-                self.translation = try LiveTranslateSupport.decode(data); self.error = nil
-                self.presentTranslation()
-            } catch is CancellationError { }
-            catch {
-                guard let self, self.session != nil, self.translationID == id, !Task.isCancelled else { return }
-                self.error = error.localizedDescription
+    private func submit(_ text: String, final: Bool) {
+        let words = LiveTranslateSupport.words(text)
+        latestRecognizedWords = words
+
+        // Send full five-word phrases during continuous speech instead of
+        // waiting for a complete sentence or a long recognition pause.
+        while words.count - submittedWordCount >= 5 {
+            enqueueTranslation(LiveTranslateSupport.phrase(words, from: submittedWordCount, count: 5))
+            submittedWordCount += 5
+        }
+
+        speechPauseTask?.cancel(); speechPauseTask = nil
+        let remaining = words.count - submittedWordCount
+        guard remaining > 0 else { return }
+        if final {
+            flushRecognizedTail(minimumWords: 1)
+        } else if remaining >= 2 {
+            // Speech recognition revises partial words frequently. A short
+            // pause lets those settle, while keeping captions responsive.
+            speechPauseTask = Task { @MainActor [weak self] in
+                do { try await Task.sleep(nanoseconds: 450_000_000) } catch { return }
+                guard let self, self.session != nil else { return }
+                self.flushRecognizedTail(minimumWords: 2)
             }
+        }
+    }
+
+    private func flushRecognizedTail(minimumWords: Int) {
+        let remaining = latestRecognizedWords.count - submittedWordCount
+        guard remaining >= minimumWords else { return }
+        enqueueTranslation(LiveTranslateSupport.phrase(latestRecognizedWords,
+                                                        from: submittedWordCount,
+                                                        count: min(5, remaining)))
+        submittedWordCount += min(5, remaining)
+    }
+
+    private func enqueueTranslation(_ phrase: String) {
+        guard !phrase.isEmpty else { return }
+        translationQueue.append(phrase)
+        guard translationWorker == nil, let token = session else { return }
+        let direction = self.direction
+        translationWorker = Task { @MainActor [weak self] in
+            guard let self else { return }
+            while !Task.isCancelled, self.session == token, !self.translationQueue.isEmpty {
+                let phrase = self.translationQueue.removeFirst()
+                guard let request = LiveTranslateSupport.request(text: phrase, direction: direction) else { continue }
+                do {
+                    let (data, response) = try await self.network.data(for: request)
+                    guard !Task.isCancelled, self.session == token else { return }
+                    guard let http = response as? HTTPURLResponse, http.statusCode == 200, data.count <= 131072 else {
+                        throw Self.failure("Translation service rejected the request. Try again later.")
+                    }
+                    self.translatedPhrases.append(try LiveTranslateSupport.decode(data))
+                    self.translation = String(self.translatedPhrases.joined(separator: " ").suffix(2000))
+                    self.error = nil
+                    self.presentTranslation()
+                } catch is CancellationError { return }
+                catch {
+                    guard !Task.isCancelled, self.session == token else { return }
+                    self.error = error.localizedDescription
+                }
+            }
+            self.translationWorker = nil
         }
     }
     private func clearCapture() -> SCStream? {
@@ -219,22 +266,28 @@ final class LiveTranslateService: NSObject, ObservableObject, NSWindowDelegate {
         return previous
     }
     func stop() {
-        session = nil; recognitionID = UUID(); translationID = UUID()
+        session = nil; recognitionID = UUID()
         for observer in sessionObservers { NSWorkspace.shared.notificationCenter.removeObserver(observer) }
         sessionObservers.removeAll()
         if let lockObserver { DistributedNotificationCenter.default().removeObserver(lockObserver) }
         lockObserver = nil
         startTask?.cancel(); startTask = nil
         rotateTask?.cancel(); rotateTask = nil
-        translateTask?.cancel(); translateTask = nil
+        speechPauseTask?.cancel(); speechPauseTask = nil
+        translationWorker?.cancel(); translationWorker = nil
+        translationQueue.removeAll()
         let previous = clearCapture()
         if let previous { Task { try? await previous.stopCapture() } }
         starting = false; running = false
         NotchService.shared.dismissTranslationNotice()
     }
     func clearText() {
-        translateTask?.cancel(); translateTask = nil; translationID = UUID()
-        transcript = ""; translation = ""; error = nil; lastSubmitted = ""
+        speechPauseTask?.cancel(); speechPauseTask = nil
+        translationWorker?.cancel(); translationWorker = nil
+        translationQueue.removeAll()
+        transcript = ""; translation = ""; error = nil
+        submittedWordCount = latestRecognizedWords.count
+        translatedPhrases.removeAll()
         NotchService.shared.dismissTranslationNotice()
     }
     func windowWillClose(_ notification: Notification) {
