@@ -250,3 +250,12 @@ layers invert the desktop y offset, while the legacy unflipped eye host does not
 Regression coverage includes neutral center, both styles' up/down mapping, negative
 display origins, and translation-section installation/removal/navigation. Static
 checks pass; native CI and physical visual confirmation remain pending.
+
+## Drag hint and Command Bar eye fit
+
+Round/Slim eye layers now preserve full configured size when split across the
+resting camera wings. In compact Companion hosts, both eyes fit within 40% of the
+host's character size, preventing layer overflow into the drop hint and Command
+Bar search text. This is a layout-only change; drag routing and Command Bar gaze
+animations are untouched. Source parsing and diff checks pass. Native CI and visual
+confirmation remain pending.

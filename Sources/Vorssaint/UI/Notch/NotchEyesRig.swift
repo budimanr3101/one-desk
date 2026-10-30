@@ -31,7 +31,12 @@ final class NotchEyesRig {
         CATransaction.begin(); CATransaction.setDisableActions(true)
         root.isHidden = !active
         root.frame = CGRect(x: 0, y: 0, width: size, height: size)
-        let diameter = CGFloat(NotchEyesSupport.eyeSize(UserDefaults.standard.double(forKey: DefaultsKey.notchEyesSize)))
+        let requested = CGFloat(NotchEyesSupport.eyeSize(UserDefaults.standard.double(forKey: DefaultsKey.notchEyesSize)))
+        // In the resting notch, the pair is deliberately split across the camera
+        // and uses full eye size. Inside a 20–22 pt companion view (drop hint or
+        // Command Bar face), fit both eyes inside that view instead of letting
+        // the Core Animation layers spill into adjacent text.
+        let diameter = separation > 0 ? requested : min(requested, max(4, size * 0.4))
         for i in eyes.indices {
             eyes[i].bounds = CGRect(x: 0, y: 0, width: diameter, height: diameter)
             eyes[i].position = CGPoint(x: size / 2 + (i == 0 ? -1 : 1) * (separation > 0 ? separation : diameter * 0.65), y: size / 2)
